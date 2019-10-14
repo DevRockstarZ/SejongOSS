@@ -1036,7 +1036,7 @@ int main() //Need to fix this up
          exitYN();
          break;
       }
-   } while (1);   //
+   } while (1); 
 
    return(0);
 }

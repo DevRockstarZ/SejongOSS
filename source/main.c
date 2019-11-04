@@ -19,7 +19,7 @@ Although this program may compile/ run in Cygwin it runs slowly.
 #include <time.h>
 #include <math.h>
 #include <Windows.h>
-#include <conio.h>
+
 
 #define SNAKE_ARRAY_SIZE 310
 

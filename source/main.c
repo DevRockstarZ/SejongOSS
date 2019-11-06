@@ -15,10 +15,9 @@ Although this program may compile/ run in Cygwin it runs slowly.
 
 */
 
-#include <stdio.h>
-#include <time.h>
-#include <math.h>
-#include <Windows.h>
+#include "fileOpen.c"
+#include "inGame.c"
+#include "screen.c"
 
 
 #define SNAKE_ARRAY_SIZE 310

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <Windows.h>
+#include <conio.h>
 
 enum keyboard {
 	UP_ARROW = 72,
@@ -29,5 +30,15 @@ void refreshInfoBar(int, int);
 void youWinScreen(void);
 
 void gameOverScreen(void);
+
+void welcomeArt(void);
+
+int mainMenu(void);
+
+void exitYN(void);
+
+void controls(void);
+
+int menuSelector(int, int, int);
 
 #endif

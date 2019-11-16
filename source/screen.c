@@ -3,37 +3,37 @@
 void gotoxy(int x, int y)
 {
 	printf("%c[%d;%df", 0x1B, y, x);
-} // ì „ë‹¬ë°›ì€ x,y ê°’ìœ¼ë¡œ ì½˜ì†”ì°½ ì»¤ì„œ ì´ë™
+} // Àü´Ş¹ŞÀº x,y °ªÀ¸·Î ÄÜ¼ÖÃ¢ Ä¿¼­ ÀÌµ¿
 
 void clrscr(void)
 {
 	system("cls");
 	return;
-} // console í™”ë©´ì„ clearí•´ì£¼ëŠ” í•¨ìˆ˜
+} // console È­¸éÀ» clearÇØÁÖ´Â ÇÔ¼ö
 
 char waitForAnyKey(void)
 {
 	int pressed;
 
-	// while (!_kbhit()); // keyboard ì…ë ¥ì´ ì—†ìœ¼ë©´ loopí•˜ë©° ëŒ€ê¸°í•œë‹¤.
+	// while (!_kbhit()); // keyboard ÀÔ·ÂÀÌ ¾øÀ¸¸é loopÇÏ¸ç ´ë±âÇÑ´Ù.
 
-	pressed = _getch(); // keyboard ì…ë ¥ê°’ì„ ë°›ì•„ì˜´
+	pressed = _getch(); // keyboard ÀÔ·Â°ªÀ» ¹Ş¾Æ¿È
 
 	return((char)pressed);
-} // í‚¤ë³´ë“œì— ì–´ë–¤ ê°’ì´ ì…ë ¥ë˜ì—ˆëŠ”ì§€ ë°›ì•„ì˜¤ëŠ” í•¨ìˆ˜. return : ëˆ„ë¥¸ í‚¤ë³´ë“œ ê°’
+} // Å°º¸µå¿¡ ¾î¶² °ªÀÌ ÀÔ·ÂµÇ¾ú´ÂÁö ¹Ş¾Æ¿À´Â ÇÔ¼ö. return : ´©¸¥ Å°º¸µå °ª
 
 void pauseMenu(void)
 {
 
-	gotoxy(28, 23); // ì½˜ì†” í•˜ë‹¨ìœ¼ë¡œ ì´ë™
+	gotoxy(28, 23); // ÄÜ¼Ö ÇÏ´ÜÀ¸·Î ÀÌµ¿
 	printf("**Paused**");
 
-	waitForAnyKey(); // ì‚¬ìš©ìì˜ ì…ë ¥ì„ ê¸°ë‹¤ë¦¼
+	waitForAnyKey(); // »ç¿ëÀÚÀÇ ÀÔ·ÂÀ» ±â´Ù¸²
 	gotoxy(28, 23);
 	printf("            ");
 
 	return;
-} // ì‚¬ìš©ìê°€ ê²Œì„ì„ ì •ì§€ í•˜ì˜€ì„ë•Œ ì¼ì‹œ ì •ì§€ í•˜ëŠ” í•¨ìˆ˜
+} // »ç¿ëÀÚ°¡ °ÔÀÓÀ» Á¤Áö ÇÏ¿´À»¶§ ÀÏ½Ã Á¤Áö ÇÏ´Â ÇÔ¼ö
 
 void refreshInfoBar(int score, int speed)
 {
@@ -50,7 +50,7 @@ void refreshInfoBar(int score, int speed)
 	printf("Version: 0.5");
 
 	return;
-} // x,yë¥¼ ì½˜ì†”ì°½ í•˜ë‹¨ìœ¼ë¡œ ì´ë™í•˜ì—¬ í”Œë ˆì´ì–´ì˜ ì ìˆ˜, ê²Œì„ì†ë„ ì¶œë ¥
+} // x,y¸¦ ÄÜ¼ÖÃ¢ ÇÏ´ÜÀ¸·Î ÀÌµ¿ÇÏ¿© ÇÃ·¹ÀÌ¾îÀÇ Á¡¼ö, °ÔÀÓ¼Óµµ Ãâ·Â
 
 void youWinScreen(void)
 {
@@ -73,8 +73,8 @@ void youWinScreen(void)
 	printf(":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::");
 	gotoxy(x, y++);
 
-	waitForAnyKey(); // ì‚¬ìš©ìì˜ ì…ë ¥ ì‘ë‹µì„ ë°›ìŒ 
-	clrscr(); // Console í™”ë©´ Clear
+	waitForAnyKey(); // »ç¿ëÀÚÀÇ ÀÔ·Â ÀÀ´äÀ» ¹ŞÀ½ 
+	clrscr(); // Console È­¸é Clear
 	return;
 }
 

@@ -7,5 +7,5 @@ Original Source Code : https://github.com/Contagious06/console-snake-game
 ### Project Gantt Chart
 ![ganttchart](./image/ganttchart.jpg)
 
-### Project Function Detailed Descriptions
+### Function Descriptions (Will Be Changed!!)
 ![function](./image/function.jpg)

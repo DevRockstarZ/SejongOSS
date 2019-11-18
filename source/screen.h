@@ -14,7 +14,6 @@ enum keyboard {
 	EXIT_BUTTON = 27,
 	PAUSE_BUTTON = 112
 };
-
 // define enum keyboard value
 
 void gotoxy(int, int);

@@ -8,14 +8,11 @@ void gotoxy(int x, int y)
 void clrscr(void)
 {
 	system("cls");
-	return;
 } // console 화면을 clear해주는 함수
 
 char waitForAnyKey(void)
 {
 	int pressed;
-
-	// while (!_kbhit()); // keyboard 입력이 없으면 loop하며 대기한다.
 
 	pressed = _getch(); // keyboard 입력값을 받아옴
 
@@ -24,55 +21,53 @@ char waitForAnyKey(void)
 
 void pauseMenu(void)
 {
-
-	gotoxy(28, 23); // 콘솔 하단으로 이동
-	printf("**Paused**");
-
-	waitForAnyKey(); // 사용자의 입력을 기다림
-	gotoxy(28, 23);
-	printf("            ");
-
+	char* str[2] = { "**게임 정지**","            " };
+	int i;
+	for (i = 0; i < 2; i++)
+	{
+		gotoxy(28, 23);
+		if (i == 0)
+		{
+			waitForAnyKey();
+		}
+		printf("%s", str[i]);
+	} // string을 배열에 넣고 for문으로 loop하며 문자열 출력으로 변경
 	return;
 } // 사용자가 게임을 정지 하였을때 일시 정지 하는 함수
 
 void refreshInfoBar(int score, int speed)
 {
-	gotoxy(5, 23);
-	printf("Score: %d", score);
-
-	gotoxy(5, 24);
-	printf("Speed: %d", speed);
-
-	gotoxy(52, 23);
-	printf("Coder: Matthew Vlietstra");
-
-	gotoxy(52, 24);
-	printf("Version: 0.5");
+	char str[2][50] = { "","Sejong Univ OSS Project : SnakeGame" };
+	int i;
+	sprintf_s(str[0], sizeof(str[0]), "점수 : %d", score);
+	for (i = 0; i < 2; i++)
+	{
+		if (i == 0) gotoxy(5, 23); // 좌측 하단으로 이동
+		else if (i == 1) gotoxy(40, 23); // 우측 하단으로 이동
+		printf("%s", str[i]);
+	} // for loop으로 string 출력 간소화
 
 	return;
 } // x,y를 콘솔창 하단으로 이동하여 플레이어의 점수, 게임속도 출력
 
 void youWinScreen(void)
 {
-	int x = 6, y = 7;
-	gotoxy(x, y++);
-	printf("'##:::'##::'#######::'##::::'##::::'##:::::'##:'####:'##::: ##:'####:");
-	gotoxy(x, y++);
-	printf(". ##:'##::'##.... ##: ##:::: ##:::: ##:'##: ##:. ##:: ###:: ##: ####:");
-	gotoxy(x, y++);
-	printf(":. ####::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ####: ##: ####:");
-	gotoxy(x, y++);
-	printf("::. ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ## ## ##:: ##::");
-	gotoxy(x, y++);
-	printf("::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##. ####::..:::");
-	gotoxy(x, y++);
-	printf("::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##:. ###:'####:");
-	gotoxy(x, y++);
-	printf("::: ##::::. #######::. #######:::::. ###. ###::'####: ##::. ##: ####:");
-	gotoxy(x, y++);
-	printf(":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::");
-	gotoxy(x, y++);
-
+	int x = 6, y = 8; // 초기 screen x,y value
+	int i;
+	char str[8][70] = {
+		"'##:::'##::'#######::'##::::'##::::'##:::::'##:'####:'##::: ##:'####:",
+		". ##:'##::'##.... ##: ##:::: ##:::: ##:'##: ##:. ##:: ###:: ##: ####:",
+		":. ####::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ####: ##: ####:",
+		"::. ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ## ## ##:: ##::",
+		"::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##. ####::..:::",
+		"::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##:. ###:'####:",
+		"::: ##::::. #######::. #######:::::. ###. ###::'####: ##::. ##: ####:",
+		":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::" };
+	for (i = 0; i < 8; i++)
+	{
+		gotoxy(x, y++);
+		printf("%s", str[i]);
+	}
 	waitForAnyKey(); // 사용자의 입력 응답을 받음 
 	clrscr(); // Console 화면 Clear
 	return;
@@ -80,67 +75,61 @@ void youWinScreen(void)
 
 void welcomeArt(void)
 {
+	int i;
+	int x = 16, y = 4; // 초기 screen x,y value
+	char str[14][50] = {
+		"    _________         _________          ",
+		"   /          )      /         )          ",
+		"  /  /~~~~~|  |     /  /~~~~~)  |          ",
+		"  |  |     |  |     |  |     |  |          ",
+		"  |  |     |  |     |  |     |  |          ",
+		"  |  |     |  |     |  |     |  |          /",
+		"  |  |     |  |     |  |     |  |        //",
+		" (o  o)    (  |_____/  /     (  (______/ /",
+		"  |__/      (         /       (         /",
+		"    |        ~~~~~~~~~         ~~~~~~~~",
+		"    ^                                 ",
+		"      Classic Retro Snake Game!         ",
+		"           시작하려면 아무키나 누르세요..   "
+	};
 	clrscr(); //clear the console
-	//Ascii art reference: http://www.chris.com/ascii/index.php?art=animals/reptiles/snakes
-	printf("\n");
-	printf("\t\t    _________         _________          \n");
-	printf("\t\t   /         \\       /         \\          \n");
-	printf("\t\t  /  /~~~~~\\  \\     /  /~~~~~\\  \\          \n");
-	printf("\t\t  |  |     |  |     |  |     |  |          \n");
-	printf("\t\t  |  |     |  |     |  |     |  |          \n");
-	printf("\t\t  |  |     |  |     |  |     |  |         /   \n");
-	printf("\t\t  |  |     |  |     |  |     |  |       //   \n");
-	printf("\t\t (o  o)    \\  \\_____/  /     \\  \\_____/ /    \n");
-	printf("\t\t  \\__/      \\         /       \\        /    \n");
-	printf("\t\t    |        ~~~~~~~~~         ~~~~~~~~       \n");
-	printf("\t\t    ^                                 \n");
-	printf("\t      Welcome To The Snake Game!         \n");
-	printf("\t             Press Any Key To Continue...   \n");
-	printf("\n");
-
+	for (i = 0; i < 14; i++)
+	{
+		gotoxy(x, y++);
+		printf("%s", str[i]);
+	}
 	waitForAnyKey();
 	return;
-}
+} // 복잡한 screen art for loop으로 정리
 
 void gameOverScreen(void)
 {
-	int x = 17, y = 3;
-
-	//http://www.network-science.de/ascii/ <- Ascii Art Gen
-
-	gotoxy(x, y++);
-	printf(":'######::::::'###::::'##::::'##:'########:\n");
-	gotoxy(x, y++);
-	printf("'##... ##::::'## ##::: ###::'###: ##.....::\n");
-	gotoxy(x, y++);
-	printf(" ##:::..::::'##:. ##:: ####'####: ##:::::::\n");
-	gotoxy(x, y++);
-	printf(" ##::'####:'##:::. ##: ## ### ##: ######:::\n");
-	gotoxy(x, y++);
-	printf(" ##::: ##:: #########: ##. #: ##: ##...::::\n");
-	gotoxy(x, y++);
-	printf(" ##::: ##:: ##.... ##: ##:.:: ##: ##:::::::\n");
-	gotoxy(x, y++);
-	printf(". ######::: ##:::: ##: ##:::: ##: ########:\n");
-	gotoxy(x, y++);
-	printf(":......::::..:::::..::..:::::..::........::\n");
-	gotoxy(x, y++);
-	printf(":'#######::'##::::'##:'########:'########::'####:\n");
-	gotoxy(x, y++);
-	printf("'##.... ##: ##:::: ##: ##.....:: ##.... ##: ####:\n");
-	gotoxy(x, y++);
-	printf(" ##:::: ##: ##:::: ##: ##::::::: ##:::: ##: ####:\n");
-	gotoxy(x, y++);
-	printf(" ##:::: ##: ##:::: ##: ######::: ########::: ##::\n");
-	gotoxy(x, y++);
-	printf(" ##:::: ##:. ##:: ##:: ##...:::: ##.. ##::::..:::\n");
-	gotoxy(x, y++);
-	printf(" ##:::: ##::. ## ##::: ##::::::: ##::. ##::'####:\n");
-	gotoxy(x, y++);
-	printf(". #######::::. ###:::: ########: ##:::. ##: ####:\n");
-	gotoxy(x, y++);
-	printf(":.......::::::...:::::........::..:::::..::....::\n");
-
+	int x = 15, y = 3; // 초기 screen x,y value
+	int i;
+	clrscr();
+	char str[16][50] = {
+		":'######::::::'###::::'##::::'##:'########:",
+		"'##... ##::::'## ##::: ###::'###: ##.....::",
+		" ##:::..::::'##:. ##:: ####'####: ##:::::::",
+		" ##::'####:'##:::. ##: ## ### ##: ######:::",
+		" ##::: ##:: #########: ##. #: ##: ##...::::",
+		" ##::: ##:: ##.... ##: ##:.:: ##: ##:::::::",
+		". ######::: ##:::: ##: ##:::: ##: ########:",
+		":......::::..:::::..::..:::::..::........::",
+		":'#######::'##::::'##:'########:'########::'####:",
+		"'##.... ##: ##:::: ##: ##.....:: ##.... ##: ####:",
+		" ##:::: ##: ##:::: ##: ##::::::: ##:::: ##: ####:",
+		" ##:::: ##: ##:::: ##: ######::: ########::: ##::",
+		" ##:::: ##:. ##:: ##:: ##...:::: ##.. ##::::..:::",
+		" ##:::: ##::. ## ##::: ##::::::: ##::. ##::'####:",
+		". #######::::. ###:::: ########: ##:::. ##: ####:",
+		":.......::::::...:::::........::..:::::..::....::"
+	};
+	for (i = 0; i < 16; i++)
+	{
+		gotoxy(x, y++);
+		printf("%s", str[i]);
+	}
 	waitForAnyKey();
 	clrscr(); //clear the console
 	return;
@@ -149,33 +138,29 @@ void gameOverScreen(void)
 int mainMenu(void)
 {
 	int x = 10, y = 5;
+	int i;
 	int yStart = y;
-
+	char* option[4] = { "새로운 게임","최고 점수","조작법","게임 종료" }; // array string으로 변경함.
 	int selected;
 
 	clrscr(); //clear the console
-	//Might be better with arrays of strings???
-	gotoxy(x, y++);
-	printf("New Game\n");
-	gotoxy(x, y++);
-	printf("High Scores\n");
-	gotoxy(x, y++);
-	printf("Controls\n");
-	gotoxy(x, y++);
-	printf("Exit\n");
-	gotoxy(x, y++);
 
+	for (i = 0; i < 4; i++)
+	{
+		gotoxy(x, y++);
+		printf("%s", option[i]);
+	}
+	gotoxy(x, y++);
 	selected = menuSelector(x, y, yStart);
 
-	return(selected);
+	return (selected);
 }
 
 void exitYN(void)
 {
 	char pressed;
 	gotoxy(9, 8);
-	printf("Are you sure you want to exit(Y/N)\n");
-
+	printf(" 게임을 종료하시겠습니까? (Y/N)\n");
 	do
 	{
 		pressed = waitForAnyKey();
@@ -192,26 +177,21 @@ void exitYN(void)
 
 void controls(void)
 {
-	int x = 10, y = 5;
+	int x = 16, y = 2;
+	int i;
 	clrscr(); //clear the console
-	gotoxy(x, y++);
-	printf("Controls\n");
-	gotoxy(x++, y++);
-	printf("Use the following arrow keys to direct the snake to the food: ");
-	gotoxy(x, y++);
-	printf("Right Arrow");
-	gotoxy(x, y++);
-	printf("Left Arrow");
-	gotoxy(x, y++);
-	printf("Top Arrow");
-	gotoxy(x, y++);
-	printf("Bottom Arrow");
-	gotoxy(x, y++);
-	gotoxy(x, y++);
-	printf("P & Esc pauses the game.");
-	gotoxy(x, y++);
-	gotoxy(x, y++);
-	printf("Press any key to continue...");
+	char str[4][50] = {
+		"            ** 게임 조작법 **",
+		"- 키보드 상하좌우 키로 Snake를 움직입니다.",
+		"- P또는 ESC키로 게임을 일시중지 할 수 있습니다.",
+		"아무버튼이나 눌러서 돌아가세요..."
+	};
+	for (i = 0; i < 4; i++)
+	{
+		gotoxy(x, y++);
+		gotoxy(x, y++);
+		printf("%s", str[i]);
+	}
 	waitForAnyKey();
 	return;
 }
@@ -259,4 +239,3 @@ int menuSelector(int x, int y, int yStart)
 	} while (key != (char)ENTER_KEY); //While doesn't equal enter... (13 ASCII code for enter) - note ubuntu is 10
 	return(i);
 }
-

@@ -10,11 +10,14 @@ void clrscr(void)
 	system("cls");
 } // console 화면을 clear해주는 함수
 
+
 char waitForAnyKey(void)
 {
 	int pressed;
 
+
 	pressed = _getch(); // keyboard 입력값을 받아옴
+
 
 	return((char)pressed);
 } // 키보드에 어떤 값이 입력되었는지 받아오는 함수. return : 누른 키보드 값
@@ -144,7 +147,6 @@ int mainMenu(void)
 	int selected;
 
 	clrscr(); //clear the console
-	
 	for (i = 0; i < 4; i++)
 	{
 		gotoxy(x, y++);
@@ -239,4 +241,3 @@ int menuSelector(int x, int y, int yStart)
 	} while (key != (char)ENTER_KEY); //While doesn't equal enter... (13 ASCII code for enter) - note ubuntu is 10
 	return(i);
 }
-

@@ -1,5 +1,22 @@
-#include "inGame.h"
+﻿#include "inGame.h"
 #include "screen.h"
+
+struct point {
+	int x;
+	int y;
+};
+
+struct window {
+	int width;
+	int height;
+};
+
+struct gameInfo {
+	int snakeLength;
+	int direction;
+	int score;
+	int speed;
+};
 
 int getGameSpeed(void)
 {
@@ -40,12 +57,12 @@ int checkKeysPressed(int direction)
 }
 
 
-int collisionSnake(int x, int y, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int detect)
+int collisionSnake(struct point PT, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int detect)
 {
 	int i;
 	for (i = detect; i < snakeLength; i++) //Checks if the snake collided with itself
 	{
-		if (x == snakeXY[0][i] && y == snakeXY[1][i])
+		if (PT.x == snakeXY[0][i] && PT.y == snakeXY[1][i])
 			return(1);
 	}
 	return(0);
@@ -54,16 +71,21 @@ int collisionSnake(int x, int y, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLengt
 
 
 //Generates food & Makes sure the food doesn't appear on top of the snake <- This sometimes causes a lag issue!!! Not too much of a problem tho
-int generateFood(int foodXY[], int width, int height, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
+int generateFood(int foodXY[], struct window WD, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 {
+
+	struct point PT;
+
 	// int i 안써서 제거
 	do
 	{
 		srand((unsigned int)(time(NULL)));
-		foodXY[0] = rand() % (width - 2) + 2;
+		foodXY[0] = rand() % (WD.width - 2) + 2;
 		srand((unsigned int)(time(NULL)));
-		foodXY[1] = rand() % (height - 6) + 2;
-	} while (collisionSnake(foodXY[0], foodXY[1], snakeXY, snakeLength, 0)); //This should prevent the "Food" from being created on top of the snake. - However the food has a chance to be created ontop of the snake, in which case the snake should eat it...
+		foodXY[1] = rand() % (WD.height - 6) + 2;
+		PT.x = foodXY[0];
+		PT.y = foodXY[1];
+	} while (collisionSnake(PT, snakeXY, snakeLength, 0)); //This should prevent the "Food" from being created on top of the snake. - However the food has a chance to be created ontop of the snake, in which case the snake should eat it...
 
 	gotoxy(foodXY[0], foodXY[1]);
 	printf("%c", FOOD);
@@ -146,13 +168,16 @@ int eatFood(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[])
 }
 
 
-int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], int consoleWidth, int consoleHeight, int snakeLength) //Need to Clean this up a bit
+int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], struct window WD, int snakeLength) //Need to Clean this up a bit
 {
+	struct point PT;
+	PT.x = snakeXY[0][0];
+	PT.y = snakeXY[1][0];
 	int colision = 0;
-	if ((snakeXY[0][0] == 1) || (snakeXY[1][0] == 1) || (snakeXY[0][0] == consoleWidth) || (snakeXY[1][0] == consoleHeight - 4)) //Checks if the snake collided wit the wall or it's self
+	if ((snakeXY[0][0] == 1) || (snakeXY[1][0] == 1) || (snakeXY[0][0] == WD.width) || (snakeXY[1][0] == WD.height - 4)) //Checks if the snake collided wit the wall or it's self
 		colision = 1;
 	else
-		if (collisionSnake(snakeXY[0][0], snakeXY[1][0], snakeXY, snakeLength, 1)) //If the snake collided with the wall, theres no point in checking if it collided with itself.
+		if (collisionSnake(PT, snakeXY, snakeLength, 1)) //If the snake collided with the wall, theres no point in checking if it collided with itself.
 			colision = 1;
 
 	return(colision);
@@ -161,14 +186,14 @@ int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], int consoleWidth, int co
 
 
 //Messy, need to clean this function up
-void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], int consoleWidth, int consoleHeight, int snakeLength, int direction, int score, int speed)
+void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct window WD, struct gameInfo GI)
 {
 	int gameOver = 0;
 	clock_t endWait;
 
 	//CLOCKS_PER_SEC-(n-1)*(CLOCKS_PER_SEC/10)
-	int waitMili = CLOCKS_PER_SEC - (speed) * (CLOCKS_PER_SEC / 10);   //Sets the correct wait time according to the selected speed
-	int tempScore = 10 * speed;
+	int waitMili = CLOCKS_PER_SEC - (GI.speed) * (CLOCKS_PER_SEC / 10);   //Sets the correct wait time according to the selected speed
+	int tempScore = 10 * GI.speed;
 	int oldDirection = 0;
 	int canChangeDirection = 1;
 	//int seconds = 1;
@@ -179,36 +204,36 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], int consoleWidth, 
 	{
 		if (canChangeDirection)
 		{
-			oldDirection = direction;
-			direction = checkKeysPressed(direction);
+			oldDirection = GI.direction;
+			GI.direction = checkKeysPressed(GI.direction);
 		}
 
-		if (oldDirection != direction)//Temp fix to prevent the snake from colliding with itself
+		if (oldDirection != GI.direction)//Temp fix to prevent the snake from colliding with itself
 			canChangeDirection = 0;
 
 		if (clock() >= endWait) //haha, it moves according to how fast the computer running it is...
 		{
 			//gotoxy(1,1);
 			//printf("%d - %d",clock() , endWait);
-			move(snakeXY, snakeLength, direction);
+			move(snakeXY, GI.snakeLength, GI.direction);
 			canChangeDirection = 1;
 
 
 			if (eatFood(snakeXY, foodXY))
 			{
-				generateFood(foodXY, consoleWidth, consoleHeight, snakeXY, snakeLength); //Generate More Food
-				snakeLength++;
-				score += speed;
+				generateFood(foodXY, WD , snakeXY, GI.snakeLength); //Generate More Food
+				GI.snakeLength++;
+				GI.score += GI.speed;
 				//x++;
 				//gotoxy(1,1);
 				//printf("%d >= %d", 10*speed+score, tempScore);
-				if (score >= 10 * speed + tempScore)
+				if (GI.score >= 10 * GI.speed + tempScore)
 					//if( 2 >= 2)
 				{
-					speed++;
-					tempScore = score;
+					GI.speed++;
+					tempScore = GI.score;
 
-					if (speed <= 9)//this needs to be fixed
+					if (GI.speed <= 9)//this needs to be fixed
 						waitMili = waitMili - (CLOCKS_PER_SEC / 10);
 					else
 					{
@@ -224,18 +249,18 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], int consoleWidth, 
 					//x = 0;
 				}
 
-				refreshInfoBar(score, speed);
+				refreshInfoBar(GI.score, GI.speed);
 			}
 
 			endWait = clock() + waitMili; //TEMP FIX, NEED TO FIND A WAY TO RESET CLOCK().. Na, seems to work fine this way...
 		}
 
-		gameOver = collisionDetection(snakeXY, consoleWidth, consoleHeight, snakeLength);
+		gameOver = collisionDetection(snakeXY, WD , GI.snakeLength);
 
-		if (snakeLength >= SNAKE_ARRAY_SIZE - 5) //Just to make sure it doesn't get longer then the array size & crash
+		if (GI.snakeLength >= SNAKE_ARRAY_SIZE - 5) //Just to make sure it doesn't get longer then the array size & crash
 		{
 			gameOver = 2;//You Win! <- doesn't seem to work - NEED TO FIX/TEST THIS
-			score += 1500; //When you win you get an extra 1500 points!!!
+			GI.score += 1500; //When you win you get an extra 1500 points!!!
 		}
 
 	} while (!gameOver);
@@ -254,9 +279,9 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], int consoleWidth, 
 		break;
 	}
 
-	if (score >= getLowestScore() && score != 0)
+	if (GI.score >= getLowestScore() && GI.score != 0)
 	{
-		inputScore(score);
+		inputScore(GI.score);
 		displayHighScores();
 	}
 
@@ -327,41 +352,43 @@ void prepairSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 //This function loads the enviroment, snake, etc
 void loadGame(void)
 {
+	struct gameInfo GI;
 	int snakeXY[2][SNAKE_ARRAY_SIZE]; //Two Dimentional Array, the first array is for the X coordinates and the second array for the Y coordinates
 
-	int snakeLength = 4; //Starting Length
+	GI.snakeLength= 4; //Starting Length
 
-	int direction = LEFT_ARROW; //DO NOT CHANGE THIS TO RIGHT ARROW, THE GAME WILL INSTANTLY BE OVER IF YOU DO!!! <- Unless the prepairSnakeArray function is changed to take into account the direction....
+	GI.direction = LEFT_ARROW; //DO NOT CHANGE THIS TO RIGHT ARROW, THE GAME WILL INSTANTLY BE OVER IF YOU DO!!! <- Unless the prepairSnakeArray function is changed to take into account the direction....
 
 	int foodXY[] = { 5,5 };// Stores the location of the food
 
-	int score = 0;
+	GI.score= 0;
 	//int level = 1;
 
-	//Window Width * Height - at some point find a way to get the actual dimensions of the console... <- Also somethings that display dont take this dimentions into account.. need to fix this...
-	int consoleWidth = 80;
-	int consoleHeight = 25;
-
-	int speed = getGameSpeed();
+	struct window WD;
+	WD.width = 80;
+	WD.height = 25;
+	GI.speed = getGameSpeed();
 
 	//The starting location of the snake
 	snakeXY[0][0] = 40;
 	snakeXY[1][0] = 10;
 
-	loadEnvironment(consoleWidth, consoleHeight); //borders
-	prepairSnakeArray(snakeXY, snakeLength);
-	loadSnake(snakeXY, snakeLength);
-	generateFood(foodXY, consoleWidth, consoleHeight, snakeXY, snakeLength);
-	refreshInfoBar(score, speed); //Bottom info bar. Score, Level etc
-	startGame(snakeXY, foodXY, consoleWidth, consoleHeight, snakeLength, direction, score, speed);
+	loadEnvironment(WD); //borders
+	prepairSnakeArray(snakeXY, GI.snakeLength);
+	loadSnake(snakeXY, GI.snakeLength);
+	generateFood(foodXY, WD , snakeXY, GI.snakeLength);
+	refreshInfoBar(GI.score, GI.speed); //Bottom info bar. Score, Level etc
+	startGame(snakeXY, foodXY, WD, GI);
 
 	return;
 }
 
-void loadEnvironment(int consoleWidth, int consoleHeight)//This can be done in a better way... FIX ME!!!! Also i think it doesn't work properly in ubuntu <- Fixed
+
+void loadEnvironment(struct window WD)//This can be done in a better way... FIX ME!!!! Also i think it doesn't work properly in ubuntu <- Fixed
 {
 	int x = 1, y = 1;
-	int rectangleHeight = consoleHeight - 4;
+	int rectangleHeight = WD.height - 4;
+
 	clrscr(); //clear the console
 
 	gotoxy(x, y); //Top left corner
@@ -371,12 +398,14 @@ void loadEnvironment(int consoleWidth, int consoleHeight)//This can be done in a
 		gotoxy(x, y); //Left Wall 
 		printf("%c", WALL);
 
-		gotoxy(consoleWidth, y); //Right Wall
+		gotoxy(WD.width, y); //Right Wall
+
 		printf("%c", WALL);
 	}
 
 	y = 1;
-	for (; x < consoleWidth + 1; x++)
+
+	for (; x < WD.width + 1; x++)
 	{
 		gotoxy(x, y); //Left Wall 
 		printf("%c", WALL);
@@ -384,26 +413,6 @@ void loadEnvironment(int consoleWidth, int consoleHeight)//This can be done in a
 		gotoxy(x, rectangleHeight); //Right Wall
 		printf("%c", WALL);
 	}
-
-	/*
-	   for (i = 0; i < 80; i++)
-	   {
-	   printf("%c",WALL);
-	   }
-	   for (i = 0; i < 17; i++)
-	   {
-	   printf("%c\n",WALL);
-	   }
-	   for (i = 0; i < 21; i++)
-	   {
-	   printf("%c\n",WALL);
-	   gotoxy(80,i);
-	   }
-	   for (i = 0; i < 81; i++)
-	   {
-	   printf("%c",WALL);
-	   }
-	*/
 	return;
 }
 

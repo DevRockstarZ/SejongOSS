@@ -13,13 +13,14 @@ enum graphic {
 	WALL = '+',
 }; // 열거형 사용
 
+
 int getGameSpeed(void);
 
 int checkKeysPressed(int direction);
 
-int collisionSnake(int x, int y, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int detect);
+int collisionSnake(struct point PT, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int detect);
 
-int generateFood(int foodXY[], int width, int height, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength);
+int generateFood(int foodXY[], struct window WD, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength);
 
 void moveSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direction);
 
@@ -27,9 +28,9 @@ void move(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direction);
 
 int eatFood(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[]);
 
-int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], int consoleWidth, int consoleHeight, int snakeLength);
+int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], struct window WD, int snakeLength);
 
-void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], int consoleWidth, int consoleHeight, int snakeLength, int direction, int score, int speed);
+void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct window WD, struct gameInfo GI);
 
 void loadSnake(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength);
 
@@ -37,6 +38,7 @@ void prepairSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength);
 
 void loadGame(void);
 
-void loadEnvironment(int consoleWidth, int consoleHeight);
+void loadEnvironment(struct window WD);
 
 #endif
+

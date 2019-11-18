@@ -1,4 +1,4 @@
-#include <time.h>
+﻿#include <time.h>
 #include <math.h>
 #include "screen.h"
 #include <stdio.h>

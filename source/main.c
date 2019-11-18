@@ -4,10 +4,6 @@
 #include <stdio.h>
 #include "inGame.h"
 
-
-const char WALL = '+';
-
-
 void createHighScores(void)
 {
 	FILE* file;
@@ -143,7 +139,7 @@ void inputScore(int score) //This seriously needs to be cleaned up
 		if (score >= fScore && entered != 1)
 		{
 			scores[x] = score;
-			strcpy_s(highScoreNames[x], sizeof(char) * 20, name); // strcpy_s ·Î º¯°æ
+			strcpy_s(highScoreNames[x], sizeof(char) * 20, name); // strcpy_s ë¡œ ë³€ê²½
 
 			//printf("%d",x+1);
 			//printf("\t%d\t\t\t%s\n",score, name);      
@@ -154,7 +150,7 @@ void inputScore(int score) //This seriously needs to be cleaned up
 		//printf("%d",x+1);
 		//printf("\t%d\t\t\t%s\n",fScore, highScoreName);
 		//strcpy(text, text+"%d\t%d\t\t\t%s\n");
-		strcpy_s(highScoreNames[x], sizeof(char) * 20, highScoreName); // strcpy_s·Î º¯°æ
+		strcpy_s(highScoreNames[x], sizeof(char) * 20, highScoreName); // strcpy_së¡œ ë³€ê²½
 		scores[x] = fScore;
 
 		//highScoreName = "";
@@ -220,65 +216,11 @@ void displayHighScores(void) //NEED TO CHECK THIS CODE!!!
 	return;
 }
 
-//**************END HIGHSCORE STUFF**************//
-
-
-void loadEnviroment(int consoleWidth, int consoleHeight)//This can be done in a better way... FIX ME!!!! Also i think it doesn't work properly in ubuntu <- Fixed
-{
-	int x = 1, y = 1;
-	int rectangleHeight = consoleHeight - 4;
-	clrscr(); //clear the console
-
-	gotoxy(x, y); //Top left corner
-
-	for (; y < rectangleHeight; y++)
-	{
-		gotoxy(x, y); //Left Wall 
-		printf("%c", WALL);
-
-		gotoxy(consoleWidth, y); //Right Wall
-		printf("%c", WALL);
-	}
-
-	y = 1;
-	for (; x < consoleWidth + 1; x++)
-	{
-		gotoxy(x, y); //Left Wall 
-		printf("%c", WALL);
-
-		gotoxy(x, rectangleHeight); //Right Wall
-		printf("%c", WALL);
-	}
-
-	/*
-	   for (i = 0; i < 80; i++)
-	   {
-	   printf("%c",WALL);
-	   }
-	   for (i = 0; i < 17; i++)
-	   {
-	   printf("%c\n",WALL);
-	   }
-	   for (i = 0; i < 21; i++)
-	   {
-	   printf("%c\n",WALL);
-	   gotoxy(80,i);
-	   }
-	   for (i = 0; i < 81; i++)
-	   {
-	   printf("%c",WALL);
-	   }
-	*/
-	return;
-}
-
-
-
 int main() //Need to fix this up
 {
-
+	system("mode con cols=80 lines=24");
 	welcomeArt();
-
+	gameOverScreen();
 	do
 	{
 		switch (mainMenu())
@@ -300,3 +242,4 @@ int main() //Need to fix this up
 
 	return(0);
 }
+

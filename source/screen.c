@@ -3,144 +3,133 @@
 void gotoxy(int x, int y)
 {
 	printf("%c[%d;%df", 0x1B, y, x);
-} // Àü´Ş¹ŞÀº x,y °ªÀ¸·Î ÄÜ¼ÖÃ¢ Ä¿¼­ ÀÌµ¿
+} // ì „ë‹¬ë°›ì€ x,y ê°’ìœ¼ë¡œ ì½˜ì†”ì°½ ì»¤ì„œ ì´ë™
 
 void clrscr(void)
 {
 	system("cls");
-	return;
-} // console È­¸éÀ» clearÇØÁÖ´Â ÇÔ¼ö
+} // console í™”ë©´ì„ clearí•´ì£¼ëŠ” í•¨ìˆ˜
 
 char waitForAnyKey(void)
 {
 	int pressed;
 
-	// while (!_kbhit()); // keyboard ÀÔ·ÂÀÌ ¾øÀ¸¸é loopÇÏ¸ç ´ë±âÇÑ´Ù.
-
-	pressed = _getch(); // keyboard ÀÔ·Â°ªÀ» ¹Ş¾Æ¿È
+	pressed = _getch(); // keyboard ì…ë ¥ê°’ì„ ë°›ì•„ì˜´
 
 	return((char)pressed);
-} // Å°º¸µå¿¡ ¾î¶² °ªÀÌ ÀÔ·ÂµÇ¾ú´ÂÁö ¹Ş¾Æ¿À´Â ÇÔ¼ö. return : ´©¸¥ Å°º¸µå °ª
+} // í‚¤ë³´ë“œì— ì–´ë–¤ ê°’ì´ ì…ë ¥ë˜ì—ˆëŠ”ì§€ ë°›ì•„ì˜¤ëŠ” í•¨ìˆ˜. return : ëˆ„ë¥¸ í‚¤ë³´ë“œ ê°’
 
 void pauseMenu(void)
 {
-
-	gotoxy(28, 23); // ÄÜ¼Ö ÇÏ´ÜÀ¸·Î ÀÌµ¿
-	printf("**Paused**");
-
-	waitForAnyKey(); // »ç¿ëÀÚÀÇ ÀÔ·ÂÀ» ±â´Ù¸²
-	gotoxy(28, 23);
-	printf("            ");
-
+	char *str[2] = { "**ê²Œì„ ì •ì§€**","            " };
+	int i;
+	for (i = 0; i < 2; i++)
+	{
+		gotoxy(28, 23);
+		if (i == 0)
+		{
+			waitForAnyKey();
+		}
+		printf("%s", str[i]);
+	} // stringì„ ë°°ì—´ì— ë„£ê³  forë¬¸ìœ¼ë¡œ loopí•˜ë©° ë¬¸ìì—´ ì¶œë ¥ìœ¼ë¡œ ë³€ê²½
 	return;
-} // »ç¿ëÀÚ°¡ °ÔÀÓÀ» Á¤Áö ÇÏ¿´À»¶§ ÀÏ½Ã Á¤Áö ÇÏ´Â ÇÔ¼ö
+} // ì‚¬ìš©ìê°€ ê²Œì„ì„ ì •ì§€ í•˜ì˜€ì„ë•Œ ì¼ì‹œ ì •ì§€ í•˜ëŠ” í•¨ìˆ˜
 
 void refreshInfoBar(int score, int speed)
 {
-	gotoxy(5, 23);
-	printf("Score: %d", score);
-
-	gotoxy(5, 24);
-	printf("Speed: %d", speed);
-
-	gotoxy(52, 23);
-	printf("Coder: Matthew Vlietstra");
-
-	gotoxy(52, 24);
-	printf("Version: 0.5");
+	char str[2][50] = {"","Sejong Univ OSS Project : SnakeGame" };
+	int i;
+	sprintf_s(str[0],sizeof(str[0]), "ì ìˆ˜ : %d", score);
+	for (i = 0; i < 2; i++)
+	{
+		if (i == 0) gotoxy(5, 23); // ì¢Œì¸¡ í•˜ë‹¨ìœ¼ë¡œ ì´ë™
+		else if (i == 1) gotoxy(40, 23); // ìš°ì¸¡ í•˜ë‹¨ìœ¼ë¡œ ì´ë™
+		printf("%s", str[i]);
+	} // for loopìœ¼ë¡œ string ì¶œë ¥ ê°„ì†Œí™”
 
 	return;
-} // x,y¸¦ ÄÜ¼ÖÃ¢ ÇÏ´ÜÀ¸·Î ÀÌµ¿ÇÏ¿© ÇÃ·¹ÀÌ¾îÀÇ Á¡¼ö, °ÔÀÓ¼Óµµ Ãâ·Â
+} // x,yë¥¼ ì½˜ì†”ì°½ í•˜ë‹¨ìœ¼ë¡œ ì´ë™í•˜ì—¬ í”Œë ˆì´ì–´ì˜ ì ìˆ˜, ê²Œì„ì†ë„ ì¶œë ¥
 
 void youWinScreen(void)
 {
-	int x = 6, y = 7;
-	gotoxy(x, y++);
-	printf("'##:::'##::'#######::'##::::'##::::'##:::::'##:'####:'##::: ##:'####:");
-	gotoxy(x, y++);
-	printf(". ##:'##::'##.... ##: ##:::: ##:::: ##:'##: ##:. ##:: ###:: ##: ####:");
-	gotoxy(x, y++);
-	printf(":. ####::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ####: ##: ####:");
-	gotoxy(x, y++);
-	printf("::. ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ## ## ##:: ##::");
-	gotoxy(x, y++);
-	printf("::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##. ####::..:::");
-	gotoxy(x, y++);
-	printf("::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##:. ###:'####:");
-	gotoxy(x, y++);
-	printf("::: ##::::. #######::. #######:::::. ###. ###::'####: ##::. ##: ####:");
-	gotoxy(x, y++);
-	printf(":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::");
-	gotoxy(x, y++);
-
-	waitForAnyKey(); // »ç¿ëÀÚÀÇ ÀÔ·Â ÀÀ´äÀ» ¹ŞÀ½ 
-	clrscr(); // Console È­¸é Clear
+	int x = 6, y = 8; // ì´ˆê¸° screen x,y value
+	int i;
+	char str[8][70] = { 
+		"'##:::'##::'#######::'##::::'##::::'##:::::'##:'####:'##::: ##:'####:",
+		". ##:'##::'##.... ##: ##:::: ##:::: ##:'##: ##:. ##:: ###:: ##: ####:",
+		":. ####::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ####: ##: ####:",
+		"::. ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ## ## ##:: ##::",
+		"::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##. ####::..:::",
+		"::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##:. ###:'####:",
+		"::: ##::::. #######::. #######:::::. ###. ###::'####: ##::. ##: ####:",
+		":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::" };
+	for (i = 0; i < 8; i++)
+	{
+		gotoxy(x, y++);
+		printf("%s", str[i]);
+	}
+	waitForAnyKey(); // ì‚¬ìš©ìì˜ ì…ë ¥ ì‘ë‹µì„ ë°›ìŒ 
+	clrscr(); // Console í™”ë©´ Clear
 	return;
 }
 
 void welcomeArt(void)
 {
+	int i;
+	int x = 16, y = 4; // ì´ˆê¸° screen x,y value
+	char str[14][50] = {
+		"    _________         _________          ",
+		"   /          )      /         )          ",
+		"  /  /~~~~~|  |     /  /~~~~~)  |          ",
+		"  |  |     |  |     |  |     |  |          ",
+		"  |  |     |  |     |  |     |  |          ",
+		"  |  |     |  |     |  |     |  |          /",
+		"  |  |     |  |     |  |     |  |        //",
+		" (o  o)    (  |_____/  /     (  (______/ /",
+		"  |__/      (         /       (         /",
+		"    |        ~~~~~~~~~         ~~~~~~~~",
+		"    ^                                 ",
+		"      Classic Retro Snake Game!         ",
+		"           ì‹œì‘í•˜ë ¤ë©´ ì•„ë¬´í‚¤ë‚˜ ëˆ„ë¥´ì„¸ìš”..   "
+	};
 	clrscr(); //clear the console
-	//Ascii art reference: http://www.chris.com/ascii/index.php?art=animals/reptiles/snakes
-	printf("\n");
-	printf("\t\t    _________         _________          \n");
-	printf("\t\t   /         \\       /         \\          \n");
-	printf("\t\t  /  /~~~~~\\  \\     /  /~~~~~\\  \\          \n");
-	printf("\t\t  |  |     |  |     |  |     |  |          \n");
-	printf("\t\t  |  |     |  |     |  |     |  |          \n");
-	printf("\t\t  |  |     |  |     |  |     |  |         /   \n");
-	printf("\t\t  |  |     |  |     |  |     |  |       //   \n");
-	printf("\t\t (o  o)    \\  \\_____/  /     \\  \\_____/ /    \n");
-	printf("\t\t  \\__/      \\         /       \\        /    \n");
-	printf("\t\t    |        ~~~~~~~~~         ~~~~~~~~       \n");
-	printf("\t\t    ^                                 \n");
-	printf("\t      Welcome To The Snake Game!         \n");
-	printf("\t             Press Any Key To Continue...   \n");
-	printf("\n");
-
+	for (i = 0; i < 14; i++)
+	{
+		gotoxy(x, y++);
+		printf("%s", str[i]);
+	}
 	waitForAnyKey();
 	return;
-}
+} // ë³µì¡í•œ screen art for loopìœ¼ë¡œ ì •ë¦¬
 
 void gameOverScreen(void)
 {
-	int x = 17, y = 3;
-
-	//http://www.network-science.de/ascii/ <- Ascii Art Gen
-
-	gotoxy(x, y++);
-	printf(":'######::::::'###::::'##::::'##:'########:\n");
-	gotoxy(x, y++);
-	printf("'##... ##::::'## ##::: ###::'###: ##.....::\n");
-	gotoxy(x, y++);
-	printf(" ##:::..::::'##:. ##:: ####'####: ##:::::::\n");
-	gotoxy(x, y++);
-	printf(" ##::'####:'##:::. ##: ## ### ##: ######:::\n");
-	gotoxy(x, y++);
-	printf(" ##::: ##:: #########: ##. #: ##: ##...::::\n");
-	gotoxy(x, y++);
-	printf(" ##::: ##:: ##.... ##: ##:.:: ##: ##:::::::\n");
-	gotoxy(x, y++);
-	printf(". ######::: ##:::: ##: ##:::: ##: ########:\n");
-	gotoxy(x, y++);
-	printf(":......::::..:::::..::..:::::..::........::\n");
-	gotoxy(x, y++);
-	printf(":'#######::'##::::'##:'########:'########::'####:\n");
-	gotoxy(x, y++);
-	printf("'##.... ##: ##:::: ##: ##.....:: ##.... ##: ####:\n");
-	gotoxy(x, y++);
-	printf(" ##:::: ##: ##:::: ##: ##::::::: ##:::: ##: ####:\n");
-	gotoxy(x, y++);
-	printf(" ##:::: ##: ##:::: ##: ######::: ########::: ##::\n");
-	gotoxy(x, y++);
-	printf(" ##:::: ##:. ##:: ##:: ##...:::: ##.. ##::::..:::\n");
-	gotoxy(x, y++);
-	printf(" ##:::: ##::. ## ##::: ##::::::: ##::. ##::'####:\n");
-	gotoxy(x, y++);
-	printf(". #######::::. ###:::: ########: ##:::. ##: ####:\n");
-	gotoxy(x, y++);
-	printf(":.......::::::...:::::........::..:::::..::....::\n");
-
+	int x = 15, y = 3; // ì´ˆê¸° screen x,y value
+	int i;
+	clrscr();
+	char str[16][50] = {
+		":'######::::::'###::::'##::::'##:'########:",
+		"'##... ##::::'## ##::: ###::'###: ##.....::",
+		" ##:::..::::'##:. ##:: ####'####: ##:::::::",
+		" ##::'####:'##:::. ##: ## ### ##: ######:::",
+		" ##::: ##:: #########: ##. #: ##: ##...::::",
+		" ##::: ##:: ##.... ##: ##:.:: ##: ##:::::::",
+		". ######::: ##:::: ##: ##:::: ##: ########:",
+		":......::::..:::::..::..:::::..::........::",
+		":'#######::'##::::'##:'########:'########::'####:",
+		"'##.... ##: ##:::: ##: ##.....:: ##.... ##: ####:",
+		" ##:::: ##: ##:::: ##: ##::::::: ##:::: ##: ####:",
+		" ##:::: ##: ##:::: ##: ######::: ########::: ##::",
+		" ##:::: ##:. ##:: ##:: ##...:::: ##.. ##::::..:::",
+		" ##:::: ##::. ## ##::: ##::::::: ##::. ##::'####:",
+		". #######::::. ###:::: ########: ##:::. ##: ####:",
+		":.......::::::...:::::........::..:::::..::....::"
+	};
+	for (i = 0; i < 16; i++)
+	{
+		gotoxy(x, y++);
+		printf("%s", str[i]);
+	}
 	waitForAnyKey();
 	clrscr(); //clear the console
 	return;
@@ -149,33 +138,29 @@ void gameOverScreen(void)
 int mainMenu(void)
 {
 	int x = 10, y = 5;
+	int i;
 	int yStart = y;
-
+	char *option[4] = { "ìƒˆë¡œìš´ ê²Œì„","ìµœê³  ì ìˆ˜","ì¡°ì‘ë²•","ê²Œì„ ì¢…ë£Œ" }; // array stringìœ¼ë¡œ ë³€ê²½í•¨.
 	int selected;
 
 	clrscr(); //clear the console
-	//Might be better with arrays of strings???
+	
+	for (i = 0; i < 4; i++)
+	{
+		gotoxy(x, y++);
+		printf("%s", option[i]);
+	}
 	gotoxy(x, y++);
-	printf("New Game\n");
-	gotoxy(x, y++);
-	printf("High Scores\n");
-	gotoxy(x, y++);
-	printf("Controls\n");
-	gotoxy(x, y++);
-	printf("Exit\n");
-	gotoxy(x, y++);
-
 	selected = menuSelector(x, y, yStart);
 
-	return(selected);
+	return (selected);
 }
 
 void exitYN(void)
 {
 	char pressed;
 	gotoxy(9, 8);
-	printf("Are you sure you want to exit(Y/N)\n");
-
+	printf(" ê²Œì„ì„ ì¢…ë£Œí•˜ì‹œê² ìŠµë‹ˆê¹Œ? (Y/N)\n");
 	do
 	{
 		pressed = waitForAnyKey();
@@ -192,26 +177,21 @@ void exitYN(void)
 
 void controls(void)
 {
-	int x = 10, y = 5;
+	int x = 16, y = 2;
+	int i;
 	clrscr(); //clear the console
-	gotoxy(x, y++);
-	printf("Controls\n");
-	gotoxy(x++, y++);
-	printf("Use the following arrow keys to direct the snake to the food: ");
-	gotoxy(x, y++);
-	printf("Right Arrow");
-	gotoxy(x, y++);
-	printf("Left Arrow");
-	gotoxy(x, y++);
-	printf("Top Arrow");
-	gotoxy(x, y++);
-	printf("Bottom Arrow");
-	gotoxy(x, y++);
-	gotoxy(x, y++);
-	printf("P & Esc pauses the game.");
-	gotoxy(x, y++);
-	gotoxy(x, y++);
-	printf("Press any key to continue...");
+	char str[4][50] = {
+		"            ** ê²Œì„ ì¡°ì‘ë²• **",
+		"- í‚¤ë³´ë“œ ìƒí•˜ì¢Œìš° í‚¤ë¡œ Snakeë¥¼ ì›€ì§ì…ë‹ˆë‹¤.",
+		"- Pë˜ëŠ” ESCí‚¤ë¡œ ê²Œì„ì„ ì¼ì‹œì¤‘ì§€ í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.",
+		"ì•„ë¬´ë²„íŠ¼ì´ë‚˜ ëˆŒëŸ¬ì„œ ëŒì•„ê°€ì„¸ìš”..."
+	};
+	for (i = 0; i < 4; i++)
+	{
+		gotoxy(x, y++);
+		gotoxy(x, y++);
+		printf("%s", str[i]);
+	}
 	waitForAnyKey();
 	return;
 }

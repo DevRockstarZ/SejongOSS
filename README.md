@@ -1,4 +1,11 @@
-# SejongOSS
-Sejong Univ. OSS Snake Game Project
-Stated 2019.10.14
-Contributer : 임주영 / 최재우 / 인하영
+# 세종대학교 오픈소스SW개론 Project
+Sejong Univ. OSS Snake Game Project<br> 
+Stated 2019.10.14<br> 
+Contributer : 임주영 / 최재우 / 인하영<br> 
+Original Source Code : https://github.com/Contagious06/console-snake-game
+
+### Project Gantt Chart
+![ganttchart](./image/ganttchart.jpg)
+
+### Project Function Detailed Descriptions
+![function](./image/function.jpg)

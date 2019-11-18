@@ -5,6 +5,14 @@
 
 #define SNAKE_ARRAY_SIZE 310
 
+enum graphic {
+	SNAKE_HEAD = 'X',
+	SNAKE_BODY = '@',
+	FOOD = '*',
+	BLANK = ' ',
+	WALL = '+',
+}; // 열거형 사용
+
 int getGameSpeed(void);
 
 int checkKeysPressed(int direction);
@@ -29,7 +37,6 @@ void prepairSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength);
 
 void loadGame(void);
 
-
-
+void loadEnvironment(int consoleWidth, int consoleHeight);
 
 #endif

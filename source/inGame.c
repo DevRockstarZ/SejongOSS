@@ -1,12 +1,6 @@
 #include "inGame.h"
 #include "screen.h"
 
-
-const char SNAKE_HEAD = 'X';
-const char SNAKE_BODY = '@';
-const char FOOD = '*';
-const char BLANK = ' ';
-
 int getGameSpeed(void)
 {
 	int speed;
@@ -25,9 +19,9 @@ int checkKeysPressed(int direction)
 {
 	int pressed;
 
-	if (_kbhit()) // kbhit¿¡¼­ _kbhitÀ¸·Î ´ëÃ¼µÊ
+	if (_kbhit()) // kbhitì—ì„œ _kbhitìœ¼ë¡œ ëŒ€ì²´ë¨
 	{
-		pressed = _getch(); // getch¿¡¼­ _getch·Î ´ëÃ¼µÊ
+		pressed = _getch(); // getchì—ì„œ _getchë¡œ ëŒ€ì²´ë¨
 		if (direction != pressed)
 		{
 			if (pressed == DOWN_ARROW && direction != UP_ARROW)
@@ -62,7 +56,7 @@ int collisionSnake(int x, int y, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLengt
 //Generates food & Makes sure the food doesn't appear on top of the snake <- This sometimes causes a lag issue!!! Not too much of a problem tho
 int generateFood(int foodXY[], int width, int height, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 {
-	// int i ¾È½á¼­ Á¦°Å
+	// int i ì•ˆì¨ì„œ ì œê±°
 	do
 	{
 		srand((unsigned int)(time(NULL)));
@@ -109,9 +103,6 @@ void moveSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direct
 
 	return;
 }
-
-
-
 
 void move(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direction)
 {
@@ -357,7 +348,7 @@ void loadGame(void)
 	snakeXY[0][0] = 40;
 	snakeXY[1][0] = 10;
 
-	loadEnviroment(consoleWidth, consoleHeight); //borders
+	loadEnvironment(consoleWidth, consoleHeight); //borders
 	prepairSnakeArray(snakeXY, snakeLength);
 	loadSnake(snakeXY, snakeLength);
 	generateFood(foodXY, consoleWidth, consoleHeight, snakeXY, snakeLength);
@@ -366,3 +357,53 @@ void loadGame(void)
 
 	return;
 }
+
+void loadEnvironment(int consoleWidth, int consoleHeight)//This can be done in a better way... FIX ME!!!! Also i think it doesn't work properly in ubuntu <- Fixed
+{
+	int x = 1, y = 1;
+	int rectangleHeight = consoleHeight - 4;
+	clrscr(); //clear the console
+
+	gotoxy(x, y); //Top left corner
+
+	for (; y < rectangleHeight; y++)
+	{
+		gotoxy(x, y); //Left Wall 
+		printf("%c", WALL);
+
+		gotoxy(consoleWidth, y); //Right Wall
+		printf("%c", WALL);
+	}
+
+	y = 1;
+	for (; x < consoleWidth + 1; x++)
+	{
+		gotoxy(x, y); //Left Wall 
+		printf("%c", WALL);
+
+		gotoxy(x, rectangleHeight); //Right Wall
+		printf("%c", WALL);
+	}
+
+	/*
+	   for (i = 0; i < 80; i++)
+	   {
+	   printf("%c",WALL);
+	   }
+	   for (i = 0; i < 17; i++)
+	   {
+	   printf("%c\n",WALL);
+	   }
+	   for (i = 0; i < 21; i++)
+	   {
+	   printf("%c\n",WALL);
+	   gotoxy(80,i);
+	   }
+	   for (i = 0; i < 81; i++)
+	   {
+	   printf("%c",WALL);
+	   }
+	*/
+	return;
+}
+

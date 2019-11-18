@@ -3,25 +3,28 @@
 void gotoxy(int x, int y)
 {
 	printf("%c[%d;%df", 0x1B, y, x);
-} // Àü´Ş¹ŞÀº x,y °ªÀ¸·Î ÄÜ¼ÖÃ¢ Ä¿¼­ ÀÌµ¿
+} // ì „ë‹¬ë°›ì€ x,y ê°’ìœ¼ë¡œ ì½˜ì†”ì°½ ì»¤ì„œ ì´ë™
 
 void clrscr(void)
 {
 	system("cls");
-} // console È­¸éÀ» clearÇØÁÖ´Â ÇÔ¼ö
+} // console í™”ë©´ì„ clearí•´ì£¼ëŠ” í•¨ìˆ˜
+
 
 char waitForAnyKey(void)
 {
 	int pressed;
 
-	pressed = _getch(); // keyboard ÀÔ·Â°ªÀ» ¹Ş¾Æ¿È
+
+	pressed = _getch(); // keyboard ì…ë ¥ê°’ì„ ë°›ì•„ì˜´
+
 
 	return((char)pressed);
-} // Å°º¸µå¿¡ ¾î¶² °ªÀÌ ÀÔ·ÂµÇ¾ú´ÂÁö ¹Ş¾Æ¿À´Â ÇÔ¼ö. return : ´©¸¥ Å°º¸µå °ª
+} // í‚¤ë³´ë“œì— ì–´ë–¤ ê°’ì´ ì…ë ¥ë˜ì—ˆëŠ”ì§€ ë°›ì•„ì˜¤ëŠ” í•¨ìˆ˜. return : ëˆ„ë¥¸ í‚¤ë³´ë“œ ê°’
 
 void pauseMenu(void)
 {
-	char* str[2] = { "**°ÔÀÓ Á¤Áö**","            " };
+	char *str[2] = { "**ê²Œì„ ì •ì§€**","            " };
 	int i;
 	for (i = 0; i < 2; i++)
 	{
@@ -31,30 +34,30 @@ void pauseMenu(void)
 			waitForAnyKey();
 		}
 		printf("%s", str[i]);
-	} // stringÀ» ¹è¿­¿¡ ³Ö°í for¹®À¸·Î loopÇÏ¸ç ¹®ÀÚ¿­ Ãâ·ÂÀ¸·Î º¯°æ
+	} // stringì„ ë°°ì—´ì— ë„£ê³  forë¬¸ìœ¼ë¡œ loopí•˜ë©° ë¬¸ìì—´ ì¶œë ¥ìœ¼ë¡œ ë³€ê²½
 	return;
-} // »ç¿ëÀÚ°¡ °ÔÀÓÀ» Á¤Áö ÇÏ¿´À»¶§ ÀÏ½Ã Á¤Áö ÇÏ´Â ÇÔ¼ö
+} // ì‚¬ìš©ìê°€ ê²Œì„ì„ ì •ì§€ í•˜ì˜€ì„ë•Œ ì¼ì‹œ ì •ì§€ í•˜ëŠ” í•¨ìˆ˜
 
 void refreshInfoBar(int score, int speed)
 {
-	char str[2][50] = { "","Sejong Univ OSS Project : SnakeGame" };
+	char str[2][50] = {"","Sejong Univ OSS Project : SnakeGame" };
 	int i;
-	sprintf_s(str[0], sizeof(str[0]), "Á¡¼ö : %d", score);
+	sprintf_s(str[0],sizeof(str[0]), "ì ìˆ˜ : %d", score);
 	for (i = 0; i < 2; i++)
 	{
-		if (i == 0) gotoxy(5, 23); // ÁÂÃø ÇÏ´ÜÀ¸·Î ÀÌµ¿
-		else if (i == 1) gotoxy(40, 23); // ¿ìÃø ÇÏ´ÜÀ¸·Î ÀÌµ¿
+		if (i == 0) gotoxy(5, 23); // ì¢Œì¸¡ í•˜ë‹¨ìœ¼ë¡œ ì´ë™
+		else if (i == 1) gotoxy(40, 23); // ìš°ì¸¡ í•˜ë‹¨ìœ¼ë¡œ ì´ë™
 		printf("%s", str[i]);
-	} // for loopÀ¸·Î string Ãâ·Â °£¼ÒÈ­
+	} // for loopìœ¼ë¡œ string ì¶œë ¥ ê°„ì†Œí™”
 
 	return;
-} // x,y¸¦ ÄÜ¼ÖÃ¢ ÇÏ´ÜÀ¸·Î ÀÌµ¿ÇÏ¿© ÇÃ·¹ÀÌ¾îÀÇ Á¡¼ö, °ÔÀÓ¼Óµµ Ãâ·Â
+} // x,yë¥¼ ì½˜ì†”ì°½ í•˜ë‹¨ìœ¼ë¡œ ì´ë™í•˜ì—¬ í”Œë ˆì´ì–´ì˜ ì ìˆ˜, ê²Œì„ì†ë„ ì¶œë ¥
 
 void youWinScreen(void)
 {
-	int x = 6, y = 8; // ÃÊ±â screen x,y value
+	int x = 6, y = 8; // ì´ˆê¸° screen x,y value
 	int i;
-	char str[8][70] = {
+	char str[8][70] = { 
 		"'##:::'##::'#######::'##::::'##::::'##:::::'##:'####:'##::: ##:'####:",
 		". ##:'##::'##.... ##: ##:::: ##:::: ##:'##: ##:. ##:: ###:: ##: ####:",
 		":. ####::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ####: ##: ####:",
@@ -68,15 +71,15 @@ void youWinScreen(void)
 		gotoxy(x, y++);
 		printf("%s", str[i]);
 	}
-	waitForAnyKey(); // »ç¿ëÀÚÀÇ ÀÔ·Â ÀÀ´äÀ» ¹ŞÀ½ 
-	clrscr(); // Console È­¸é Clear
+	waitForAnyKey(); // ì‚¬ìš©ìì˜ ì…ë ¥ ì‘ë‹µì„ ë°›ìŒ 
+	clrscr(); // Console í™”ë©´ Clear
 	return;
 }
 
 void welcomeArt(void)
 {
 	int i;
-	int x = 16, y = 4; // ÃÊ±â screen x,y value
+	int x = 16, y = 4; // ì´ˆê¸° screen x,y value
 	char str[14][50] = {
 		"    _________         _________          ",
 		"   /          )      /         )          ",
@@ -90,7 +93,7 @@ void welcomeArt(void)
 		"    |        ~~~~~~~~~         ~~~~~~~~",
 		"    ^                                 ",
 		"      Classic Retro Snake Game!         ",
-		"           ½ÃÀÛÇÏ·Á¸é ¾Æ¹«Å°³ª ´©¸£¼¼¿ä..   "
+		"           ì‹œì‘í•˜ë ¤ë©´ ì•„ë¬´í‚¤ë‚˜ ëˆ„ë¥´ì„¸ìš”..   "
 	};
 	clrscr(); //clear the console
 	for (i = 0; i < 14; i++)
@@ -100,11 +103,11 @@ void welcomeArt(void)
 	}
 	waitForAnyKey();
 	return;
-} // º¹ÀâÇÑ screen art for loopÀ¸·Î Á¤¸®
+} // ë³µì¡í•œ screen art for loopìœ¼ë¡œ ì •ë¦¬
 
 void gameOverScreen(void)
 {
-	int x = 15, y = 3; // ÃÊ±â screen x,y value
+	int x = 15, y = 3; // ì´ˆê¸° screen x,y value
 	int i;
 	clrscr();
 	char str[16][50] = {
@@ -140,11 +143,10 @@ int mainMenu(void)
 	int x = 10, y = 5;
 	int i;
 	int yStart = y;
-	char* option[4] = { "»õ·Î¿î °ÔÀÓ","ÃÖ°í Á¡¼ö","Á¶ÀÛ¹ı","°ÔÀÓ Á¾·á" }; // array stringÀ¸·Î º¯°æÇÔ.
+	char *option[4] = { "ìƒˆë¡œìš´ ê²Œì„","ìµœê³  ì ìˆ˜","ì¡°ì‘ë²•","ê²Œì„ ì¢…ë£Œ" }; // array stringìœ¼ë¡œ ë³€ê²½í•¨.
 	int selected;
 
 	clrscr(); //clear the console
-
 	for (i = 0; i < 4; i++)
 	{
 		gotoxy(x, y++);
@@ -160,7 +162,7 @@ void exitYN(void)
 {
 	char pressed;
 	gotoxy(9, 8);
-	printf(" °ÔÀÓÀ» Á¾·áÇÏ½Ã°Ú½À´Ï±î? (Y/N)\n");
+	printf(" ê²Œì„ì„ ì¢…ë£Œí•˜ì‹œê² ìŠµë‹ˆê¹Œ? (Y/N)\n");
 	do
 	{
 		pressed = waitForAnyKey();
@@ -181,10 +183,10 @@ void controls(void)
 	int i;
 	clrscr(); //clear the console
 	char str[4][50] = {
-		"            ** °ÔÀÓ Á¶ÀÛ¹ı **",
-		"- Å°º¸µå »óÇÏÁÂ¿ì Å°·Î Snake¸¦ ¿òÁ÷ÀÔ´Ï´Ù.",
-		"- P¶Ç´Â ESCÅ°·Î °ÔÀÓÀ» ÀÏ½ÃÁßÁö ÇÒ ¼ö ÀÖ½À´Ï´Ù.",
-		"¾Æ¹«¹öÆ°ÀÌ³ª ´­·¯¼­ µ¹¾Æ°¡¼¼¿ä..."
+		"            ** ê²Œì„ ì¡°ì‘ë²• **",
+		"- í‚¤ë³´ë“œ ìƒí•˜ì¢Œìš° í‚¤ë¡œ Snakeë¥¼ ì›€ì§ì…ë‹ˆë‹¤.",
+		"- Pë˜ëŠ” ESCí‚¤ë¡œ ê²Œì„ì„ ì¼ì‹œì¤‘ì§€ í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.",
+		"ì•„ë¬´ë²„íŠ¼ì´ë‚˜ ëˆŒëŸ¬ì„œ ëŒì•„ê°€ì„¸ìš”..."
 	};
 	for (i = 0; i < 4; i++)
 	{

@@ -11,7 +11,8 @@ enum graphic {
 	FOOD = '*',
 	BLANK = ' ',
 	WALL = '+',
-}; // ¿­°ÅÇü »ç¿ë
+}; // ì—´ê±°í˜• ì‚¬ìš©
+
 
 int getGameSpeed(void);
 
@@ -40,3 +41,4 @@ void loadGame(void);
 void loadEnvironment(struct window WD);
 
 #endif
+

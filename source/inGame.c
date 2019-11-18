@@ -73,7 +73,9 @@ int collisionSnake(struct point PT, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLe
 //Generates food & Makes sure the food doesn't appear on top of the snake <- This sometimes causes a lag issue!!! Not too much of a problem tho
 int generateFood(int foodXY[], struct window WD, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 {
+
 	struct point PT;
+
 	// int i 안써서 제거
 	do
 	{
@@ -381,10 +383,12 @@ void loadGame(void)
 	return;
 }
 
+
 void loadEnvironment(struct window WD)//This can be done in a better way... FIX ME!!!! Also i think it doesn't work properly in ubuntu <- Fixed
 {
 	int x = 1, y = 1;
 	int rectangleHeight = WD.height - 4;
+
 	clrscr(); //clear the console
 
 	gotoxy(x, y); //Top left corner
@@ -395,10 +399,12 @@ void loadEnvironment(struct window WD)//This can be done in a better way... FIX 
 		printf("%c", WALL);
 
 		gotoxy(WD.width, y); //Right Wall
+
 		printf("%c", WALL);
 	}
 
 	y = 1;
+
 	for (; x < WD.width + 1; x++)
 	{
 		gotoxy(x, y); //Left Wall 
@@ -407,6 +413,6 @@ void loadEnvironment(struct window WD)//This can be done in a better way... FIX 
 		gotoxy(x, rectangleHeight); //Right Wall
 		printf("%c", WALL);
 	}
-
 	return;
 }
+

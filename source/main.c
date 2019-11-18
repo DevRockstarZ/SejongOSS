@@ -1,8 +1,5 @@
 
-#include <time.h>
-#include <math.h>
 #include "screen.h"
-#include <stdio.h>
 #include "inGame.h"
 #include "HighScores.h"
 
@@ -10,7 +7,7 @@ int main() //Need to fix this up
 {
 	system("mode con cols=80 lines=24");
 	welcomeArt();
-	gameOverScreen();
+
 	do
 	{
 		switch (mainMenu())

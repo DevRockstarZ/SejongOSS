@@ -1,4 +1,6 @@
 #include "screen.h"
+#include "HighScores.h"
+#include "inGame.h"
 
 void gotoxy(int x, int y)
 {
@@ -10,16 +12,55 @@ void clrscr(void)
 	system("cls");
 } // console 화면을 clear해주는 함수
 
+void clearArrow(int x, int y)
+{
+	gotoxy(x, y);
+	printf(" ");
+	return;
+} // 메인메뉴 옵션 화살표 clear function
+
+void printArrow(int x, int y)
+{
+	gotoxy(x, y);
+	printf(">");
+	return;
+}// 메인메뉴 옵션 화살표 print function
+
+void mainMenu(void)
+{
+	int exit = FALSE;
+	system("mode con cols=80 lines=24"); // command console 크기 변경
+	welcomeArt();
+	clrscr(); //clear the console
+	do // do-while loop until exit is TRUE
+	{
+		switch (menuSelector())
+		{
+		case 0:
+			loadGame();
+			break;
+		case 1:
+			displayHighScores();
+			break;
+		case 2:
+			controls();
+			break;
+		case 3:
+			exit = exitYN(); // 나갈지 여부를 받음.
+			break;
+		default:
+			break;
+		}
+	} while (exit != TRUE);
+
+	return; // if returns, goto main, and ends.
+}
 
 char waitForAnyKey(void)
 {
 	int pressed;
-
-
 	pressed = _getch(); // keyboard 입력값을 받아옴
-
-
-	return((char)pressed);
+	return ((char)pressed);
 } // 키보드에 어떤 값이 입력되었는지 받아오는 함수. return : 누른 키보드 값
 
 void pauseMenu(void)
@@ -28,7 +69,7 @@ void pauseMenu(void)
 	int i;
 	for (i = 0; i < 2; i++)
 	{
-		gotoxy(28, 23);
+		gotoxy(pauseX, pauseY);
 		if (i == 0)
 		{
 			waitForAnyKey();
@@ -40,13 +81,13 @@ void pauseMenu(void)
 
 void refreshInfoBar(int score, int speed)
 {
-	char str[2][50] = {"","Sejong Univ OSS Project : SnakeGame" };
+	char str[2][50] = { "","Sejong Univ OSS Project : SnakeGame" };
 	int i;
-	sprintf_s(str[0],sizeof(str[0]), "점수 : %d", score);
+	sprintf_s(str[0], sizeof(str[0]), "점수 : %d", score);
 	for (i = 0; i < 2; i++)
 	{
-		if (i == 0) gotoxy(5, 23); // 좌측 하단으로 이동
-		else if (i == 1) gotoxy(40, 23); // 우측 하단으로 이동
+		if (i == 0) gotoxy(refreshLeftX, refreshLeftY); // 좌측 하단으로 이동
+		else if (i == 1) gotoxy(refreshRightX, refreshRightY); // 우측 하단으로 이동
 		printf("%s", str[i]);
 	} // for loop으로 string 출력 간소화
 
@@ -55,9 +96,9 @@ void refreshInfoBar(int score, int speed)
 
 void youWinScreen(void)
 {
-	int x = 6, y = 8; // 초기 screen x,y value
+	int yPos = youwinY;
 	int i;
-	char str[8][70] = { 
+	char str[8][70] = {
 		"'##:::'##::'#######::'##::::'##::::'##:::::'##:'####:'##::: ##:'####:",
 		". ##:'##::'##.... ##: ##:::: ##:::: ##:'##: ##:. ##:: ###:: ##: ####:",
 		":. ####::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ####: ##: ####:",
@@ -68,7 +109,7 @@ void youWinScreen(void)
 		":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::" };
 	for (i = 0; i < 8; i++)
 	{
-		gotoxy(x, y++);
+		gotoxy(youwinX, yPos++);
 		printf("%s", str[i]);
 	}
 	waitForAnyKey(); // 사용자의 입력 응답을 받음 
@@ -79,7 +120,7 @@ void youWinScreen(void)
 void welcomeArt(void)
 {
 	int i;
-	int x = 16, y = 4; // 초기 screen x,y value
+	int yPos = welcomeY; // 초기 screen x,y value
 	char str[14][50] = {
 		"    _________         _________          ",
 		"   /          )      /         )          ",
@@ -98,7 +139,7 @@ void welcomeArt(void)
 	clrscr(); //clear the console
 	for (i = 0; i < 14; i++)
 	{
-		gotoxy(x, y++);
+		gotoxy(welcomeX, yPos++);
 		printf("%s", str[i]);
 	}
 	waitForAnyKey();
@@ -107,7 +148,7 @@ void welcomeArt(void)
 
 void gameOverScreen(void)
 {
-	int x = 15, y = 3; // 초기 screen x,y value
+	int yPos = gameOverY; // 초기 screen x,y value
 	int i;
 	clrscr();
 	char str[16][50] = {
@@ -130,7 +171,7 @@ void gameOverScreen(void)
 	};
 	for (i = 0; i < 16; i++)
 	{
-		gotoxy(x, y++);
+		gotoxy(gameOverX, yPos++);
 		printf("%s", str[i]);
 	}
 	waitForAnyKey();
@@ -138,48 +179,28 @@ void gameOverScreen(void)
 	return;
 }
 
-int mainMenu(void)
-{
-	int x = 10, y = 5;
-	int i;
-	int yStart = y;
-	char *option[4] = { "새로운 게임","최고 점수","조작법","게임 종료" }; // array string으로 변경함.
-	int selected;
-
-	clrscr(); //clear the console
-	for (i = 0; i < 4; i++)
-	{
-		gotoxy(x, y++);
-		printf("%s", option[i]);
-	}
-	gotoxy(x, y++);
-	selected = menuSelector(x, y, yStart);
-
-	return (selected);
-}
-
-void exitYN(void)
+BOOL exitYN(void)
 {
 	char pressed;
-	gotoxy(9, 8);
+	gotoxy(exitX, exitY);
 	printf(" 게임을 종료하시겠습니까? (Y/N)\n");
 	do
 	{
 		pressed = waitForAnyKey();
-		pressed = (char)tolower(pressed);
+		pressed = (char)tolower(pressed); // 소문자 입력할수도 있음
 	} while (!(pressed == 'y' || pressed == 'n'));
 
 	if (pressed == 'y')
 	{
 		clrscr(); //clear the console
-		exit(1);
+		return TRUE;
 	}
-	return;
+	return FALSE;
 }
 
 void controls(void)
 {
-	int x = 16, y = 2;
+	int yPos = controlY;
 	int i;
 	clrscr(); //clear the console
 	char str[4][50] = {
@@ -190,54 +211,75 @@ void controls(void)
 	};
 	for (i = 0; i < 4; i++)
 	{
-		gotoxy(x, y++);
-		gotoxy(x, y++);
+		gotoxy(controlX, yPos++);
+		gotoxy(controlX, yPos++);
 		printf("%s", str[i]);
 	}
-	waitForAnyKey();
+
+	waitForAnyKey(); //입력 대기
+	clrscr();
 	return;
 }
 
-int menuSelector(int x, int y, int yStart)
+int * moveArrow(int x,int y,int option,int KEY)
+{
+	int arr[2];
+	clearArrow(x, y);
+	if (KEY == (char)UP_ARROW)
+	{
+		if (y == optionYStart)
+		{
+			y = optionYEnd;
+			option = optionExit;
+		}
+		else
+		{
+			option = option - 1;
+			y--;
+		}
+		printArrow(x, y);
+	}
+	else if (KEY == (char)DOWN_ARROW)
+	{
+		if (y == optionYEnd)
+		{
+			y = optionYStart;
+			option = optionLoadGame;
+		}
+		else
+		{
+			option = option + 1;
+			y++;
+		}
+		printArrow(x, y);
+	}
+	arr[0] = option;
+	arr[1] = y;
+	return arr;
+}
+
+int menuSelector(void)
 {
 	char key;
-	int i = 0;
-	x = x - 2;
-	gotoxy(x, yStart);
-
-	printf(">");
-
-	gotoxy(1, 1);
-
+	int *arr;
+	char *str[4] = { "새로운 게임","최고 점수","조작법","게임 종료" }; // array string으로 변경함.
+	int option = noOption;
+	int x = optionXStart;
+	int y = optionYStart;
+	int i;
+	int printY = printYMenu;
+	for (i = 0; i < 4; i++)
+	{
+		gotoxy(printXMenu, printY++);
+		printf("%s", str[i]);
+	}
+	printArrow(x, y);
 	do
 	{
 		key = waitForAnyKey();
-		//printf("%c %d", key, (int)key);
-		if (key == (char)UP_ARROW)
-		{
-			gotoxy(x, yStart + i);
-			printf(" ");
-
-			if (yStart >= yStart + i)
-				i = y - yStart - 2;
-			else
-				i--;
-			gotoxy(x, yStart + i);
-			printf(">");
-		}
-		else
-			if (key == (char)DOWN_ARROW)
-			{
-				gotoxy(x, yStart + i);
-				printf(" ");
-
-				if (i + 2 >= y - yStart)
-					i = 0;
-				else
-					i++;
-				gotoxy(x, yStart + i);
-				printf(">");
-			}
-	} while (key != (char)ENTER_KEY); //While doesn't equal enter... (13 ASCII code for enter) - note ubuntu is 10
-	return(i);
+		arr = moveArrow(x, y, option, key);
+		option = arr[0];
+		y = arr[1];
+	} while (key != (char)ENTER_KEY); // 엔터키 입력 전까지 LOOP
+	return (option);
 }

@@ -14,6 +14,35 @@ enum keyboard {
 	EXIT_BUTTON = 27,
 	PAUSE_BUTTON = 112
 };
+
+enum constValue {
+	pauseX = 28,
+	pauseY = 23,
+	refreshLeftX = 5,
+	refreshLeftY = 23,
+	refreshRightX = 40,
+	refreshRightY = 23,
+	youwinX = 6,
+	youwinY = 8,
+	welcomeX = 16,
+	welcomeY = 4,
+	gameOverX = 15,
+	gameOverY = 3,
+	exitX = 9,
+	exitY = 8,
+	controlX = 16,
+	controlY = 2,
+	noOption = 0,
+	printXMenu = 10,
+	printYMenu = 5,
+	optionXStart = 8,
+	optionYStart = 5,
+	optionYEnd = 8,
+	optionLoadGame = 0,
+	optionHighScores = 1,
+	optionControls = 2,
+	optionExit = 3
+};
 // define enum keyboard value
 
 void gotoxy(int, int);
@@ -32,12 +61,17 @@ void gameOverScreen(void);
 
 void welcomeArt(void);
 
-int mainMenu(void);
+void mainMenu(void);
 
-void exitYN(void);
+BOOL exitYN(void);
 
 void controls(void);
 
-int menuSelector(int, int, int);
+int menuSelector(void); // 매개변수 2개로 수정
 
+void clearArrow(int, int); // 메인메뉴 화살표 제거 함수
+
+void printArrow(int, int); // 메인메뉴 화살표 출력 함수
+
+int * moveArrow(int, int, int,int); // 메인메뉴 화살표 움직이기 have to return array!!!
 #endif

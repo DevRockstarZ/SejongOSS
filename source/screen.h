@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <conio.h>
+#include <malloc.h>
 
 enum keyboard {
 	UP_ARROW = 72,
@@ -13,7 +14,7 @@ enum keyboard {
 	ENTER_KEY = 13,
 	EXIT_BUTTON = 27,
 	PAUSE_BUTTON = 112
-};
+}; // define enum keyboard value
 
 enum constValue {
 	pauseX = 28,
@@ -33,17 +34,16 @@ enum constValue {
 	controlX = 16,
 	controlY = 2,
 	noOption = 0,
-	printXMenu = 10,
-	printYMenu = 5,
-	optionXStart = 8,
-	optionYStart = 5,
-	optionYEnd = 8,
+	printXMenu = 16,
+	printYMenu = 4,
+	optionXStart = 24,
+	optionYStart = 17,
+	optionYEnd = 20,
 	optionLoadGame = 0,
 	optionHighScores = 1,
 	optionControls = 2,
 	optionExit = 3
-};
-// define enum keyboard value
+}; // define const values
 
 void gotoxy(int, int);
 
@@ -53,7 +53,7 @@ char waitForAnyKey(void);
 
 void pauseMenu(void);
 
-void refreshInfoBar(int, int);
+void refreshInfoBar(int);
 
 void youWinScreen(void);
 
@@ -74,4 +74,5 @@ void clearArrow(int, int); // 메인메뉴 화살표 제거 함수
 void printArrow(int, int); // 메인메뉴 화살표 출력 함수
 
 int * moveArrow(int, int, int,int); // 메인메뉴 화살표 움직이기 have to return array!!!
+
 #endif

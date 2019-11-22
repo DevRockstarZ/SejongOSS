@@ -205,5 +205,6 @@ void displayHighScores(void) //NEED TO CHECK THIS CODE!!!
 
 	printf("Press any key to continue...");
 	waitForAnyKey();
+	clrscr(); // Issue #2 수정, menu 재선택 시 화면 클리어 문제 (JooYoung)
 	return;
 }

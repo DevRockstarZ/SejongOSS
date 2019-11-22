@@ -81,9 +81,9 @@ void pauseMenu(void)
 
 void refreshInfoBar(int score)
 {
-	char str[2][50] = { "","Sejong Univ OSS Project : SnakeGame" };
+	char str[2][50] = {"","Sejong Univ OSS Project : SnakeGame" };
 	int i;
-	sprintf_s(str[0], sizeof(str[0]), "점수 : %d", score);
+	sprintf_s(str[0], sizeof(str[0]), "점수 : %d", score); // str[0]에 현재 점수를 입력 받음.
 	for (i = 0; i < 2; i++)
 	{
 		if (i == 0) gotoxy(refreshLeftX, refreshLeftY); // 좌측 하단으로 이동
@@ -96,7 +96,7 @@ void refreshInfoBar(int score)
 
 void youWinScreen(void)
 {
-	int yPos = youwinY;
+	int yPos = youwinY; // 처음 출력할 screen y Position 정의
 	int i;
 	char str[8][70] = {
 		"'##:::'##::'#######::'##::::'##::::'##:::::'##:'####:'##::: ##:'####:",
@@ -106,7 +106,8 @@ void youWinScreen(void)
 		"::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##. ####::..:::",
 		"::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##:. ###:'####:",
 		"::: ##::::. #######::. #######:::::. ###. ###::'####: ##::. ##: ####:",
-		":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::" };
+		":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::" 
+	}; // array string으로 변경
 	for (i = 0; i < 8; i++)
 	{
 		gotoxy(youwinX, yPos++);
@@ -135,7 +136,8 @@ void welcomeArt(void)
 		"    ^                                 ",
 		"      Classic Retro Snake Game!         ",
 		"           시작하려면 아무키나 누르세요..   "
-	};
+	}; // array string으로 변경
+
 	clrscr(); //clear the console
 	for (i = 0; i < 14; i++)
 	{
@@ -168,7 +170,8 @@ void gameOverScreen(void)
 		" ##:::: ##::. ## ##::: ##::::::: ##::. ##::'####:",
 		". #######::::. ###:::: ########: ##:::. ##: ####:",
 		":.......::::::...:::::........::..:::::..::....::"
-	};
+	}; // array string 으로 변경
+
 	for (i = 0; i < 16; i++)
 	{
 		gotoxy(gameOverX, yPos++);
@@ -196,7 +199,7 @@ BOOL exitYN(void)
 		return TRUE;
 	}
 	return FALSE;
-}
+} // TRUE 일때 program exit , 아니면 no exit
 
 void controls(void)
 {
@@ -223,15 +226,15 @@ void controls(void)
 
 int * moveArrow(int x,int y,int option,int KEY)
 {
-	int *arr = (int *)malloc(sizeof(int) * 2);
-	clearArrow(x, y);
+	int *arr = (int *)malloc(sizeof(int) * 2); // array malloc 으로 선언
+	clearArrow(x, y); // 현재 선택된 값 화살표 초기화
 	if (KEY == (char)UP_ARROW)
 	{
-		if (y == optionYStart)
+		if (y == optionYStart) // 맨 처음 옵션이라면 
 		{
 			y = optionYEnd;
 			option = optionExit;
-		}
+		} // 맨 아래로 이동
 		else
 		{
 			option = option - 1;
@@ -241,11 +244,11 @@ int * moveArrow(int x,int y,int option,int KEY)
 	}
 	else if (KEY == (char)DOWN_ARROW)
 	{
-		if (y == optionYEnd)
+		if (y == optionYEnd) // 마지막 옵션이라면
 		{
 			y = optionYStart;
 			option = optionLoadGame;
-		}
+		} // 맨위로 이동
 		else
 		{
 			option = option + 1;
@@ -256,19 +259,37 @@ int * moveArrow(int x,int y,int option,int KEY)
 	arr[0] = option;
 	arr[1] = y;
 	return arr;
-}
+} // main 화면에서의 화살표를 변경해주는 함수. return value : array(selected option,yPosition)
 
 int menuSelector(void)
 {
 	char key;
 	int *arr;
-	char *str[4] = { "새로운 게임","최고 점수","조작법","게임 종료" }; // array string으로 변경함.
+	char str[17][50] = {
+	"    _________         _________          ",
+	"   /          )      /         )          ",
+	"  /  /~~~~~|  |     /  /~~~~~)  |          ",
+	"  |  |     |  |     |  |     |  |          ",
+	"  |  |     |  |     |  |     |  |          ",
+	"  |  |     |  |     |  |     |  |          /",
+	"  |  |     |  |     |  |     |  |        //",
+	" (o  o)    (  |_____/  /     (  (______/ /",
+	"  |__/      (         /       (         /",
+	"    |        ~~~~~~~~~         ~~~~~~~~",
+	"    ^                                 ",
+	"      Classic Retro Snake Game!         ",
+	"                                        ",
+	"           ● 새로운 게임",
+	"           ● 최고 점수",
+	"           ● 조작법",
+	"           ● 게임 종료"
+	}; // array string으로 변경
 	int option = noOption;
 	int x = optionXStart;
 	int y = optionYStart;
 	int i;
 	int printY = printYMenu;
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 17; i++)
 	{
 		gotoxy(printXMenu, printY++);
 		printf("%s", str[i]);

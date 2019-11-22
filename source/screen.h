@@ -29,8 +29,8 @@ enum constValue {
 	welcomeY = 4,
 	gameOverX = 15,
 	gameOverY = 3,
-	exitX = 9,
-	exitY = 8,
+	exitX = 20,
+	exitY = 21,
 	controlX = 16,
 	controlY = 2,
 	noOption = 0,
@@ -73,6 +73,6 @@ void clearArrow(int, int); // 메인메뉴 화살표 제거 함수
 
 void printArrow(int, int); // 메인메뉴 화살표 출력 함수
 
-int * moveArrow(int, int, int,int); // 메인메뉴 화살표 움직이기 have to return array!!!
+int * moveArrow(int, int, int, int); // 메인메뉴 화살표 움직이기 have to return array!!!
 
 #endif

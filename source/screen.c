@@ -81,7 +81,7 @@ void pauseMenu(void)
 
 void refreshInfoBar(int score)
 {
-	char str[2][50] = {"","Sejong Univ OSS Project : SnakeGame" };
+	char str[2][50] = { "","Sejong Univ OSS Project : SnakeGame" };
 	int i;
 	sprintf_s(str[0], sizeof(str[0]), "점수 : %d", score); // str[0]에 현재 점수를 입력 받음.
 	for (i = 0; i < 2; i++)
@@ -106,7 +106,7 @@ void youWinScreen(void)
 		"::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##. ####::..:::",
 		"::: ##:::: ##:::: ##: ##:::: ##:::: ##: ##: ##:: ##:: ##:. ###:'####:",
 		"::: ##::::. #######::. #######:::::. ###. ###::'####: ##::. ##: ####:",
-		":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::" 
+		":::..::::::.......::::.......:::::::...::...:::....::..::::..::....::"
 	}; // array string으로 변경
 	for (i = 0; i < 8; i++)
 	{
@@ -198,6 +198,7 @@ BOOL exitYN(void)
 		clrscr(); //clear the console
 		return TRUE;
 	}
+	clrscr(); // Issue #3 수정
 	return FALSE;
 } // TRUE 일때 program exit , 아니면 no exit
 
@@ -224,7 +225,7 @@ void controls(void)
 	return;
 }
 
-int * moveArrow(int x,int y,int option,int KEY)
+int * moveArrow(int x, int y, int option, int KEY)
 {
 	int *arr = (int *)malloc(sizeof(int) * 2); // array malloc 으로 선언
 	clearArrow(x, y); // 현재 선택된 값 화살표 초기화
@@ -304,3 +305,4 @@ int menuSelector(void)
 	} while (key != (char)ENTER_KEY); // 엔터키 입력 전까지 LOOP
 	return (option);
 }
+

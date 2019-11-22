@@ -1,8 +1,10 @@
 
+
 #ifndef HIGHSCORES_H
 #define HIGHSCORES_H
 
 #include <stdio.h>
+#include <math.h>
 
 void createHighScores(void);
 

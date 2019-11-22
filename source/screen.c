@@ -79,7 +79,7 @@ void pauseMenu(void)
 	return;
 } // 사용자가 게임을 정지 하였을때 일시 정지 하는 함수
 
-void refreshInfoBar(int score, int speed)
+void refreshInfoBar(int score)
 {
 	char str[2][50] = { "","Sejong Univ OSS Project : SnakeGame" };
 	int i;
@@ -223,7 +223,7 @@ void controls(void)
 
 int * moveArrow(int x,int y,int option,int KEY)
 {
-	int arr[2];
+	int *arr = (int *)malloc(sizeof(int) * 2);
 	clearArrow(x, y);
 	if (KEY == (char)UP_ARROW)
 	{

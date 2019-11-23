@@ -1,5 +1,6 @@
 
 
+
 #ifndef HIGHSCORES_H
 #define HIGHSCORES_H
 
@@ -21,5 +22,12 @@ typedef struct HighScoreList
 void inputScore(int score);
 
 void displayHighScores();
+
+enum constvalue
+{
+	xpos = 20,
+	ypos = 11,
+	display_ypos = 8
+};
 
 #endif

@@ -1,210 +1,215 @@
 
-
 #include "HighScores.h"
 #include "screen.h"
 
-void createHighScores(void)
+//최고점 1~5위를 저장할 txt 파일 생성
+void createHighScores()
 {
-	FILE* file;
+	FILE* wfile;
 	int i;
 
-	fopen_s(&file, "highscores.txt", "w+");
+	fopen_s(&wfile, "highscores.txt", "w+");
 
-	if (file == NULL)
+	if (wfile == NULL) //파일 열기 실패
 	{
-		printf("FAILED TO CREATE FILE!!!");
+		printf("Failed to create file!!!");
 		exit(0);
 	}
 
+	//highscores.txt 파일에 해당 숫자와 문자열 저장
 	for (i = 0; i < 5; i++)
 	{
-		fprintf(file, "%d", i + 1);
-		fprintf(file, "%s", "\t0\t\t\tEMPTY\n");
+		fprintf(wfile, "%d", i + 1);
+		fprintf(wfile, "%s", "\t0\t\t\tEMPTY\n");
 	}
 
-	fclose(file);
+	fclose(wfile);
 	return;
 }
 
+//str 점수 부분을 문자형에서 정수형으로 변환한 후, 점수 반환
+int str_to_int_score(int len, char *str)
+{
+	int i;
+	double sc = 0;
+
+	for (i = 0; i < len; i++)
+	{
+		sc = sc + ((int)str[2 + i] - 48)*pow(10, len - i - 1);
+	}
+
+	return (int)sc;
+}
+
+//txt 파일에 저장되어 있는 점수들 중 가장 낮은 점수 반환
 int getLowestScore()
 {
-	FILE* fp;
+	FILE* rfile;
 	char str[128];
-	double lowestScore = 0;
+	int lowscore = 0;
 	int i;
-	int intLength;
 
-	fopen_s(&fp, "highscores.txt", "r");
-	if (fp == NULL)
+	fopen_s(&rfile, "highscores.txt", "r");
+	if (rfile == NULL) //파일 열기 실패
 	{
-		createHighScores();
-		exit(1);
+		createHighScores(); //새로운 txt 파일 생성
+		fopen_s(&rfile, "highscores.txt", "r");
+		if (rfile == NULL)
+		{
+			exit(1);
+		}
 	}
 
-	while (!feof(fp))
+	//txt 파일을 한 줄씩 str에 저장
+	while (!feof(rfile))
 	{
-		fgets(str, 126, fp);
+		fgets(str, 126, rfile);
 	}
-	fclose(fp);
+	fclose(rfile);
 
 	i = 0;
-
-	//Gets the Int length
 	while (str[2 + i] != '\t')
 	{
 		i++;
 	}
+	lowscore = str_to_int_score(i, str);
 
-	intLength = i;
-
-	//Gets converts the string to int
-	for (i = 0; i < intLength; i++)
-	{
-		lowestScore = lowestScore + ((int)str[2 + i] - 48) * pow(10, intLength - i - 1);
-	}
-
-	return((int)lowestScore);
+	return lowscore;
 }
 
-void inputScore(int score) //This seriously needs to be cleaned up
+//새로운 점수와 txt 파일의 1~5위까지 점수를 비교한 후, 갱신 
+void inputScore(int score)
 {
-	FILE* fp;
-	FILE* file;
-	char str[20];
-	double fScore;
-	int i, s, y;
-	int intLength;
-	double scores[5];
-	int x;
-	char highScoreName[20];
-	char highScoreNames[5][20];
+	HighScoreList hslist[5]; //1~5위까지 점수와 이름을 저장할 구조체
+	FILE* rfile; //r 전용 파일 포인터
+	FILE* wfile; //w+ 전용 파일 포인터
+	char str[128];
+	char *initial = "\t0\t\t\tEMPTY\n";
+	int fscore; //txt 파일에 저장된 점수
+	char uname[20]; //입력받을 user name
+	char fname[20]; //txt 파일에 저장된 이름
+	int i, s, x;
+	int entered = 0; //이미 점수가 hslist에 입력되었는지 확인
 
-	char name[20];
+	clrscr(); //콘솔 화면 초기화
 
-	int entered = 0;
-
-	clrscr(); //clear the console
-	fopen_s(&fp, "highscores.txt", "r");
-	if(fp == NULL)
+	fopen_s(&rfile, "highscores.txt", "r");
+	if (rfile == NULL) //파일 열기 실패
 	{
-		createHighScores();
-		exit(1);
+		createHighScores(); //새로운 파일 생성
+		fopen_s(&rfile, "highscores.txt", "r");
+		if (rfile == NULL)
+		{
+			exit(1);
+		}
 	}
+
+	//해당 위치에 문구 출력
 	gotoxy(10, 5);
 	printf("Your Score made it into the top 5!!!");
 	gotoxy(10, 6);
 	printf("Please enter your name: ");
-
-	gets_s(name, sizeof(name));
+	
+	gets_s(uname, sizeof(uname)); //user name 입력
 
 	x = 0;
-	while (!feof(fp))
+	while (!feof(rfile))
 	{
-		fgets(str, 126, fp);  //Gets a line of text
+		//txt 파일을 한 줄씩 str에 저장
+		fgets(str, 126, rfile);
 
+		//txt 파일에 저장된 점수
 		i = 0;
-
-		//Gets the Int length
 		while (str[2 + i] != '\t')
 		{
 			i++;
 		}
+		fscore = str_to_int_score(i, str);
 
+		//txt 파일에 저장된 이름
 		s = i;
-		intLength = i;
 		i = 0;
 		while (str[5 + s] != '\n')
 		{
-			//printf("%c",str[5+s]);
-			highScoreName[i] = str[5 + s];
-			s++;
+			fname[i] = str[5 + s];
 			i++;
+			s++;
 		}
-		//printf("\n");
+		fname[i] = '\0';
 
-		fScore = 0;
-		//Gets converts the string to int
-		for (i = 0; i < intLength; i++)
+		//user 점수와 txt 파일에 저장된 점수 비교
+		if (score >= fscore && entered != 1)
 		{
-			//printf("%c", str[2+i]);
-			fScore = fScore + ((int)str[2 + i] - 48) * pow(10, intLength - i - 1);
-		}
-
-		if (score >= fScore && entered != 1)
-		{
-			scores[x] = score;
-			strcpy_s(highScoreNames[x], sizeof(highScoreNames[x]), name); // strcpy_s 로 변경
-
-			//printf("%d",x+1);
-			//printf("\t%d\t\t\t%s\n",score, name);
-			x++;
+			hslist[x].hscore = score;
+			strcpy_s(hslist[x].hsname, sizeof(hslist[x].hsname), uname);
 			entered = 1;
+			x++;
 		}
-
-		//printf("%d",x+1);
-		//printf("\t%d\t\t\t%s\n",fScore, highScoreName);
-		//strcpy(text, text+"%d\t%d\t\t\t%s\n");
-		strcpy_s(highScoreNames[x], sizeof(highScoreNames[x]), highScoreName); // strcpy_s로 변경
-		scores[x] = fScore;
-
-		//highScoreName = "";
-		for (y = 0; y < 20; y++)
-		{
-			highScoreName[y] = 0;
-		}
+		hslist[x].hscore = fscore;
+		strcpy_s(hslist[x].hsname, sizeof(hslist[x].hsname), fname);
+		
+		//txt 파일에 저장된 이름을 저장할 변수 초기화
+		strcpy_s(fname, sizeof(fname), "NULL");
 
 		x++;
-		if (x >= 5)
+		if (x >= 5) //5개의 점수와 이름을 입력받은 후, 반복문 정지
+		{
 			break;
+		}
 	}
+	fclose(rfile);
 
-	fclose(fp);
-	fopen_s(&file, "highscores.txt", "w+");
-	if(file == NULL)
-	{
-		createHighScores();
-		exit(0);
-	}
-
+	//txt 파일을 초기화한 후, 구조체에 저장된 점수와 이름 입력
+	fopen_s(&wfile, "highscores.txt", "w+");
 	for (i = 0; i < 5; i++)
 	{
-		//printf("%d\t%d\t\t\t%s\n", i+1, scores[i], highScoreNames[i]);
-		fprintf(file, "%d\t%d\t\t\t%s\n", i + 1, (int)scores[i], highScoreNames[i]);
+		fprintf(wfile, "%d\t%d\t\t\t%s\n", i + 1, hslist[i].hscore, hslist[i].hsname);
 	}
-
-	fclose(file);
-
+	fclose(wfile);
 	return;
 }
 
-void displayHighScores(void) //NEED TO CHECK THIS CODE!!!
+//txt 파일에 저장된 1~5위까지의 점수와 이름을 화면에 출력
+void displayHighScores()
 {
-	FILE* fp;
+	FILE* rfile;
 	char str[128];
 	int y = 5;
 
-	clrscr(); //clear the console
-	fopen_s(&fp, "highscores.txt", "r");
-	if(fp == NULL)
+	clrscr(); //콘솔 화면 초기화
+
+	fopen_s(&rfile, "highscores.txt", "r");
+	if (rfile == NULL) //파일 열기 실패
 	{
-		createHighScores();
-		exit(1);
+		createHighScores(); //새로운 파일 생성
+		fopen_s(&rfile, "highscores.txt", "r");
+		if (rfile == NULL)
+		{
+			exit(1);
+		}
 	}
+
+	//해당 위치에 문구 출력
 	gotoxy(10, y++);
 	printf("High Scores");
 	gotoxy(10, y++);
 	printf("Rank\tScore\t\t\tName");
-	while (!feof(fp)) {
+
+	//txt 파일을 한 줄씩 출력
+	while (!feof(rfile))
+	{
 		gotoxy(10, y++);
-		if (fgets(str, 126, fp))
+		if (fgets(str, 126, rfile))
+		{
 			printf("%s", str);
+		}
 	}
+	fclose(rfile);
 
-	fclose(fp);   //Close the file
+	//해당 위치에 문구 출력
 	gotoxy(10, y++);
-
 	printf("Press any key to continue...");
-	waitForAnyKey();
-	clrscr(); // Issue #2 수정, menu 재선택 시 화면 클리어 문제 (JooYoung)
+	waitForAnyKey(); //키보드 값 입력
+	clrscr(); //Issue #2 수정, menu 재선택 시 화면 클리어 문제(JooYoung)
 	return;
 }

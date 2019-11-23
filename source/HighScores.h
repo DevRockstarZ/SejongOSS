@@ -6,12 +6,20 @@
 #include <stdio.h>
 #include <math.h>
 
-void createHighScores(void);
+void createHighScores();
+
+int str_to_int_score(int len, char *str);
 
 int getLowestScore();
 
+typedef struct HighScoreList
+{
+	int hscore;
+	char hsname[20];
+}HighScoreList;
+
 void inputScore(int score);
 
-void displayHighScores(void);
+void displayHighScores();
 
 #endif

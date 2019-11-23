@@ -1,4 +1,5 @@
 
+
 #include "HighScores.h"
 #include "screen.h"
 
@@ -12,7 +13,7 @@ void createHighScores()
 
 	if (wfile == NULL) //파일 열기 실패
 	{
-		printf("Failed to create file!!!");
+		printf("파일 생성을 실패했습니다.");
 		exit(0);
 	}
 
@@ -80,11 +81,11 @@ int getLowestScore()
 //새로운 점수와 txt 파일의 1~5위까지 점수를 비교한 후, 갱신 
 void inputScore(int score)
 {
+	int xp = xpos, yp = ypos;
 	HighScoreList hslist[5]; //1~5위까지 점수와 이름을 저장할 구조체
 	FILE* rfile; //r 전용 파일 포인터
 	FILE* wfile; //w+ 전용 파일 포인터
 	char str[128];
-	char *initial = "\t0\t\t\tEMPTY\n";
 	int fscore; //txt 파일에 저장된 점수
 	char uname[20]; //입력받을 user name
 	char fname[20]; //txt 파일에 저장된 이름
@@ -105,11 +106,11 @@ void inputScore(int score)
 	}
 
 	//해당 위치에 문구 출력
-	gotoxy(10, 5);
-	printf("Your Score made it into the top 5!!!");
-	gotoxy(10, 6);
-	printf("Please enter your name: ");
-	
+	gotoxy(xp, yp);
+	printf("5위 안에 드는 점수를 달성했습니다!!!");
+	gotoxy(xp, ++yp);
+	printf("이름을 입력해주세요: ");
+
 	gets_s(uname, sizeof(uname)); //user name 입력
 
 	x = 0;
@@ -147,7 +148,7 @@ void inputScore(int score)
 		}
 		hslist[x].hscore = fscore;
 		strcpy_s(hslist[x].hsname, sizeof(hslist[x].hsname), fname);
-		
+
 		//txt 파일에 저장된 이름을 저장할 변수 초기화
 		strcpy_s(fname, sizeof(fname), "NULL");
 
@@ -174,8 +175,7 @@ void displayHighScores()
 {
 	FILE* rfile;
 	char str[128];
-	int y = 5;
-
+	int xp=xpos, yp = display_ypos;
 	clrscr(); //콘솔 화면 초기화
 
 	fopen_s(&rfile, "highscores.txt", "r");
@@ -190,15 +190,15 @@ void displayHighScores()
 	}
 
 	//해당 위치에 문구 출력
-	gotoxy(10, y++);
+	gotoxy(xp, yp++);
 	printf("High Scores");
-	gotoxy(10, y++);
+	gotoxy(xp, yp++);
 	printf("Rank\tScore\t\t\tName");
 
 	//txt 파일을 한 줄씩 출력
 	while (!feof(rfile))
 	{
-		gotoxy(10, y++);
+		gotoxy(xp, yp++);
 		if (fgets(str, 126, rfile))
 		{
 			printf("%s", str);
@@ -207,8 +207,8 @@ void displayHighScores()
 	fclose(rfile);
 
 	//해당 위치에 문구 출력
-	gotoxy(10, y++);
-	printf("Press any key to continue...");
+	gotoxy(xp, yp++);
+	printf("아무 버튼이나 눌러서 돌아가세요...");
 	waitForAnyKey(); //키보드 값 입력
 	clrscr(); //Issue #2 수정, menu 재선택 시 화면 클리어 문제(JooYoung)
 	return;

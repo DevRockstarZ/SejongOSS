@@ -51,12 +51,12 @@ int collisionSnake(struct point PT, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLe
 	return(false);
 } // 뱀머리PT와 몸이 부딪혔는지, 또는 Food생성시 Food와 접촉했는지 확인하는 함수
 
-int collisionWall(struct point PT, struct wallInfo WI)
+int collisionObst(struct point PT, struct obstInfo OI)
 {
 	int i;
-	for (i = 0; i < WI.wallCount; i++)
+	for (i = 0; i < OI.obstCount; i++)
 	{
-		if (PT.x == WI.wallXY[0][i] && PT.y == WI.wallXY[1][i])
+		if (PT.x == OI.obstXY[0][i] && PT.y == OI.obstXY[1][i])
 			return(true);
 	} // 입력한 PT좌표와 생성된 장애물들 좌표 비교
 	return(false);
@@ -82,23 +82,23 @@ int generateFood(int foodXY[], int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 	return(0);
 } // Food 생성 함수
 
-int generateWall(struct wallInfo *WI, int foodXY[], int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
+int generateObst(struct obstInfo *OI, int foodXY[], int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 {
 	struct point PT;
 	do
 	{
 		srand((unsigned int)(time(NULL)));
-		WI->wallXY[0][WI->wallCount] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 1000000) % (defaultWidth - 2) + 2;
+		OI->obstXY[0][OI->obstCount] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 1000000) % (defaultWidth - 2) + 2;
 		srand((unsigned int)(time(NULL)));
-		WI->wallXY[1][WI->wallCount] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 1000000) % (defaultHeight - 6) + 2;
-		PT.x = WI->wallXY[0][WI->wallCount];
-		PT.y = WI->wallXY[1][WI->wallCount];
+		OI->obstXY[1][OI->obstCount] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 1000000) % (defaultHeight - 6) + 2;
+		PT.x = OI->obstXY[0][OI->obstCount];
+		PT.y = OI->obstXY[1][OI->obstCount];
 	} while (collisionSnake(PT, snakeXY, snakeLength, 0) 
-		|| collisionWall(PT, *WI)
+		|| collisionObst(PT, *OI)
 		|| (PT.x == foodXY[0] && PT.y == foodXY[1])
 		); // 생성되면 안되는 위치에 생성하는 것 방지
 
-	gotoxy(WI->wallXY[0][WI->wallCount], WI->wallXY[1][WI->wallCount]);
+	gotoxy(OI->obstXY[0][OI->obstCount], OI->obstXY[1][OI->obstCount]);
 	printf("%c", OBSTACLE); // 장애물 출력
 
 	return(0);
@@ -171,7 +171,7 @@ int eatFood(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[])
 	return(0);
 } // 뱀머리좌표와 음식의 좌표를 확인하는 함수
 
-int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, struct wallInfo WI)
+int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, struct obstInfo OI)
 {
 	struct point PT;
 	PT.x = snakeXY[0][0];
@@ -179,7 +179,7 @@ int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, struct 
 	int collision = false;
 	if ((snakeXY[0][0] == 1) || (snakeXY[1][0] == 1) || (snakeXY[0][0] == defaultWidth) || (snakeXY[1][0] == defaultHeight - calcWall))
 		collision = true; // 벽에 부딪혔는지 조건 검사
-	else if (collisionWall(PT, WI))
+	else if (collisionObst(PT, OI))
 		collision = true; // 장애물에 부딪혔는지 조건 검사
 	else
 		if (collisionSnake(PT, snakeXY, snakeLength, 1))
@@ -197,8 +197,8 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct gameInfo GI
 
 	int canChangeDirection = true; // 방향 전환시 바뀌기 전에 
 	int oldDirection = false;
-	struct wallInfo WI; // 장애물 정보를 담는 구조체
-	WI.wallCount = initWallCount;
+	struct obstInfo OI; // 장애물 정보를 담는 구조체
+	OI.obstCount = initObstCount;
 
 	endWait = clock() + waitMili; // 현재시각 + 기다릴시간 계산
 
@@ -226,11 +226,11 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct gameInfo GI
 				GI.snakeLength++; // 뱀 길이 증가
 				GI.score += addScore; // 점수 증가
 
-				if (GI.snakeLength % createWall == false)
+				if (GI.snakeLength % createObst == false)
 				{
-					generateWall(&WI, foodXY, snakeXY, GI.snakeLength);
+					generateObst(&OI, foodXY, snakeXY, GI.snakeLength);
 				} // 뱀이 일정길이가 될때마다 장애물 생성
-				WI.wallCount++; // 장애물 갯수 카운트
+				OI.obstCount++; // 장애물 갯수 카운트
 
 				refreshInfoBar(GI.score); // 정보 최신화
 			}
@@ -238,7 +238,7 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct gameInfo GI
 			endWait = clock() + waitMili; // 새로운 시간 설정
 		}
 
-		gameOver = collisionDetection(snakeXY, GI.snakeLength, WI); // 게임 종료 검사
+		gameOver = collisionDetection(snakeXY, GI.snakeLength, OI); // 게임 종료 검사
 
 		if (GI.snakeLength >= SNAKE_ARRAY_SIZE - 5) // 게임 승리 조건
 		{

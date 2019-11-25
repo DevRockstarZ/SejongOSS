@@ -193,7 +193,7 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct gameInfo GI
 	int gameOver = false;
 	clock_t endWait;
 
-	int waitMili = CLOCKS_PER_SEC - (addScore) * (CLOCKS_PER_SEC / difficulty);// 진행 속도 설정
+	int waitMili = CLOCKS_PER_SEC - (speed) * (CLOCKS_PER_SEC / difficulty);// 진행 속도 설정
 
 	int canChangeDirection = true; // 방향 전환시 바뀌기 전에 
 	int oldDirection = false;

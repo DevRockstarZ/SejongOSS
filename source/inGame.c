@@ -51,16 +51,27 @@ int collisionSnake(struct point PT, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLe
 	return(false);
 } // 뱀머리PT와 몸이 부딪혔는지, 또는 Food생성시 Food와 접촉했는지 확인하는 함수
 
+int collisionObst(struct point PT, struct obstInfo OI)
+{
+	int i;
+	for (i = 0; i < OI.obstCount; i++)
+	{
+		if (PT.x == OI.obstXY[0][i] && PT.y == OI.obstXY[1][i])
+			return(true);
+	} // 입력한 PT좌표와 생성된 장애물들 좌표 비교
+	return(false);
+} // 장애물이 중복된 위치에 생성되지 않도록 하는 함수
 
-int generateFood(int foodXY[], struct window WD, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
+
+int generateFood(int foodXY[], int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 {
 	struct point PT;
 	do
 	{
 		srand((unsigned int)(time(NULL)));
-		foodXY[0] = (int)((double)rand() / (RAND_MAX) * (WD.width - 2.0) * 100000) % (WD.width - 2) + 2;
+		foodXY[0] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 100000) % (defaultWidth - 2) + 2;
 		srand((unsigned int)(time(NULL)));
-		foodXY[1] = (int)((double)rand() / (RAND_MAX) * (WD.width - 2.0) * 100000) % (WD.height - 6) + 2;
+		foodXY[1] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 100000) % (defaultHeight - 6) + 2;
 		PT.x = foodXY[0];
 		PT.y = foodXY[1];
 	} while (collisionSnake(PT, snakeXY, snakeLength, 0)); // 콘솔 내 좌표 랜덤값과 뱀의 위에 Food가 생성되지 않도록 방지
@@ -70,6 +81,28 @@ int generateFood(int foodXY[], struct window WD, int snakeXY[][SNAKE_ARRAY_SIZE]
 
 	return(0);
 } // Food 생성 함수
+
+int generateObst(struct obstInfo *OI, int foodXY[], int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
+{
+	struct point PT;
+	do
+	{
+		srand((unsigned int)(time(NULL)));
+		OI->obstXY[0][OI->obstCount] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 1000000) % (defaultWidth - 2) + 2;
+		srand((unsigned int)(time(NULL)));
+		OI->obstXY[1][OI->obstCount] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 1000000) % (defaultHeight - 6) + 2;
+		PT.x = OI->obstXY[0][OI->obstCount];
+		PT.y = OI->obstXY[1][OI->obstCount];
+	} while (collisionSnake(PT, snakeXY, snakeLength, 0) 
+		|| collisionObst(PT, *OI)
+		|| (PT.x == foodXY[0] && PT.y == foodXY[1])
+		); // 생성되면 안되는 위치에 생성하는 것 방지
+
+	gotoxy(OI->obstXY[0][OI->obstCount], OI->obstXY[1][OI->obstCount]);
+	printf("%c", OBSTACLE); // 장애물 출력
+
+	return(0);
+} // 장애물 생성 함수
 
 
 void moveSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direction)
@@ -138,31 +171,34 @@ int eatFood(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[])
 	return(0);
 } // 뱀머리좌표와 음식의 좌표를 확인하는 함수
 
-int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], struct window WD, int snakeLength)
+int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, struct obstInfo OI)
 {
 	struct point PT;
 	PT.x = snakeXY[0][0];
 	PT.y = snakeXY[1][0];
-	int colision = false;
-	if ((snakeXY[0][0] == 1) || (snakeXY[1][0] == 1) || (snakeXY[0][0] == WD.width) || (snakeXY[1][0] == WD.height - calcWall))
-		colision = true; // 벽에 부딪혔는지 조건 검사
+	int collision = false;
+	if ((snakeXY[0][0] == 1) || (snakeXY[1][0] == 1) || (snakeXY[0][0] == defaultWidth) || (snakeXY[1][0] == defaultHeight - calcWall))
+		collision = true; // 벽에 부딪혔는지 조건 검사
+	else if (collisionObst(PT, OI))
+		collision = true; // 장애물에 부딪혔는지 조건 검사
 	else
 		if (collisionSnake(PT, snakeXY, snakeLength, 1))
-			colision = true; // 뱀 스스로 부딪혔는지 검사
+			collision = true; // 뱀 스스로 부딪혔는지 검사
 
-	return(colision);
+	return(collision);
 } // 게임종료 조건의 충돌을 검사하는 함수
 
-void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct window WD, struct gameInfo GI)
+void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct gameInfo GI)
 {
 	int gameOver = false;
 	clock_t endWait;
 
-	int waitMili = CLOCKS_PER_SEC - (gameSpeed) * (CLOCKS_PER_SEC / difficulty);// 선택한 속도에 따른 진행속도 설정
-	int tempScore = difficulty * gameSpeed; // 난이도 조절용 점수
+	int waitMili = CLOCKS_PER_SEC - (addScore) * (CLOCKS_PER_SEC / difficulty);// 진행 속도 설정
 
 	int canChangeDirection = true; // 방향 전환시 바뀌기 전에 
 	int oldDirection = false;
+	struct obstInfo OI; // 장애물 정보를 담는 구조체
+	OI.obstCount = initObstCount;
 
 	endWait = clock() + waitMili; // 현재시각 + 기다릴시간 계산
 
@@ -186,14 +222,15 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct window WD, 
 
 			if (eatFood(snakeXY, foodXY)) // 음식을 먹었을 때
 			{
-				generateFood(foodXY, WD , snakeXY, GI.snakeLength); // 음식을 새로 하나 생성
+				generateFood(foodXY, snakeXY, GI.snakeLength); // 음식을 새로 하나 생성
 				GI.snakeLength++; // 뱀 길이 증가
-				GI.score += gameSpeed; // 난이도에 따른 점수 증가
+				GI.score += addScore; // 점수 증가
 
-				if (GI.score >= difficulty * gameSpeed + tempScore) // 점수가 일정이상 증가하면
+				if (GI.snakeLength % createObst == false)
 				{
-					tempScore = GI.score; // 점수 임시 저장
-				}
+					generateObst(&OI, foodXY, snakeXY, GI.snakeLength);
+				} // 뱀이 일정길이가 될때마다 장애물 생성
+				OI.obstCount++; // 장애물 갯수 카운트
 
 				refreshInfoBar(GI.score); // 정보 최신화
 			}
@@ -201,7 +238,7 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct window WD, 
 			endWait = clock() + waitMili; // 새로운 시간 설정
 		}
 
-		gameOver = collisionDetection(snakeXY, WD , GI.snakeLength); // 게임 종료 검사
+		gameOver = collisionDetection(snakeXY, GI.snakeLength, OI); // 게임 종료 검사
 
 		if (GI.snakeLength >= SNAKE_ARRAY_SIZE - 5) // 게임 승리 조건
 		{
@@ -278,28 +315,25 @@ void loadGame(void)
 
 	GI.score= 0; // 시작 점수
 
-	struct window WD; // 창 크기 저장
-	WD.width = defaultWidth;
-	WD.height = defaultHeight;
 	getGameStart(); // speed 입력받는 함수
 	snakeXY[0][0] = startSnakeX; // 시작위치
 	snakeXY[1][0] = startSnakeY;
 
-	loadEnvironment(WD); // 배경설정 불러오기
+	loadEnvironment(); // 배경설정 불러오기
 	prepairSnakeArray(snakeXY, GI.snakeLength); // 뱀배열에 값넣기
 	loadSnake(snakeXY, GI.snakeLength); // 뱀배열 그리기
-	generateFood(foodXY, WD , snakeXY, GI.snakeLength); // 음식생성
+	generateFood(foodXY, snakeXY, GI.snakeLength); // 음식생성
 	refreshInfoBar(GI.score); // 하단에 정보 초기화
-	startGame(snakeXY, foodXY, WD, GI); // 게임 시작함수 호출
+	startGame(snakeXY, foodXY, GI); // 게임 시작함수 호출
 
 	return;
 }
 
 
-void loadEnvironment(struct window WD)
+void loadEnvironment(void)
 {
 	int x = zeroPoint, y = zeroPoint;
-	int heightCount = WD.height - calcWall;
+	int heightCount = defaultHeight - calcWall;
 
 	clrscr(); // 화면 초기화
 
@@ -310,13 +344,13 @@ void loadEnvironment(struct window WD)
 		gotoxy(x, y); // 좌측 벽
 		printf("%c", WALL);
 
-		gotoxy(WD.width, y); // 우측 벽
+		gotoxy(defaultWidth, y); // 우측 벽
 		printf("%c", WALL);
 	}
 
 	y = 1;
 
-	for (; x < WD.width + 1; x++)
+	for (; x < defaultWidth + 1; x++)
 	{
 		gotoxy(x, y); // 상단 벽
 		printf("%c", WALL);

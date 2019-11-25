@@ -9,7 +9,7 @@ void createHighScores()
 	FILE* wfile;
 	int i;
 
-	fopen_s(&wfile, "highscores.txt", "w+");
+	fopen_s(&wfile, "highscores.txt", "w");
 
 	if (wfile == NULL) //파일 열기 실패
 	{
@@ -146,17 +146,20 @@ void inputScore(int score)
 			entered = 1;
 			x++;
 		}
-		hslist[x].hscore = fscore;
-		strcpy_s(hslist[x].hsname, sizeof(hslist[x].hsname), fname);
-
-		//txt 파일에 저장된 이름을 저장할 변수 초기화
-		strcpy_s(fname, sizeof(fname), "NULL");
-
-		x++;
-		if (x >= 5) //5개의 점수와 이름을 입력받은 후, 반복문 정지
+		if (x < 5)
+		{
+			hslist[x].hscore = fscore;
+			strcpy_s(hslist[x].hsname, sizeof(hslist[x].hsname), fname);
+		}
+		else //5개의 점수와 이름을 입력받은 후, 반복문 정지
 		{
 			break;
 		}
+		
+		x++;
+
+		//txt 파일에 저장된 이름을 저장할 변수 초기화
+		strcpy_s(fname, sizeof(fname), "NULL");
 	}
 	fclose(rfile);
 

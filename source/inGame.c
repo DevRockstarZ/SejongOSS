@@ -327,7 +327,7 @@ void loadGame(void)
 	startGame(snakeXY, foodXY, GI); // 게임 시작함수 호출
 
 	return;
-}
+} // 게임 기본 환경설정을 불러오는 함수
 
 
 void loadEnvironment(void)

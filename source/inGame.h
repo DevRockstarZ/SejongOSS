@@ -11,11 +11,6 @@ struct point {
 	int y;
 }; // x,y 좌표 저장
 
-struct window {
-	int width;
-	int height;
-}; // 콘솔창 크기 저장
-
 struct gameInfo {
 	int snakeLength;
 	int direction;

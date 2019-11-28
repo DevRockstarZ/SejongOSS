@@ -36,7 +36,7 @@ enum graphic {
 	OBSTACLE = '#'
 }; // 열거형 사용
 
-enum constVlaue {
+enum constValue {
 	zeroPoint = 0,
 	false = 0,
 	true = 1,

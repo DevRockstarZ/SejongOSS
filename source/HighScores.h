@@ -9,9 +9,7 @@
 
 void createHighScores();
 
-int str_to_int_score(int len, char *str);
-
-int getLowestScore();
+int strToIntScore(int len, char *str);
 
 typedef struct HighScoreList
 {

@@ -1,36 +1,19 @@
 ﻿#include "inGame.h"
 #include "screen.h"
+#include "HighScores.h"
 
-struct point {
-	int x;
-	int y;
-};
-
-struct window {
-	int width;
-	int height;
-};
-
-struct gameInfo {
-	int snakeLength;
-	int direction;
-	int score;
-	int speed;
-};
-
-int getGameSpeed(void)
+int getGameStart(void)
 {
-	int speed;
 	clrscr();
 
 	do
 	{
-		gotoxy(10, 5);
-		printf("Select The game speed between 1 and 9.");
-		speed = waitForAnyKey() - 48;
-	} while (speed < 1 || speed > 9);
-	return(speed);
-}
+		gotoxy(gameStartX, gameStartY);
+		printf("게임을 시작하려면 아무 키나 누르세요.");
+	} while (!waitForAnyKey()); // 키가 입력될때 까지
+
+	return true;
+} // 게임 시작을 하는 함수
 
 int checkKeysPressed(int direction)
 {
@@ -50,48 +33,76 @@ int checkKeysPressed(int direction)
 			else if (pressed == RIGHT_ARROW && direction != LEFT_ARROW)
 				direction = pressed;
 			else if (pressed == EXIT_BUTTON || pressed == PAUSE_BUTTON)
-				pauseMenu();
-		}
+				pauseMenu(); // 일시정지
+		} // 입력한 키가 유효한지 확인하는 조건문
 	}
 	return(direction);
-}
+} // 입력한 방향키를 확인하는 함수
 
 
 int collisionSnake(struct point PT, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int detect)
 {
 	int i;
-	for (i = detect; i < snakeLength; i++) //Checks if the snake collided with itself
+	for (i = detect; i < snakeLength; i++)
 	{
 		if (PT.x == snakeXY[0][i] && PT.y == snakeXY[1][i])
-			return(1);
-	}
-	return(0);
-}
+			return(true);
+	} // 입력받은 detect인자부터 뱀의 길이만큼의 좌표와 입력한 PT 좌표를 비교
+	return(false);
+} // 뱀머리PT와 몸이 부딪혔는지, 또는 Food생성시 Food와 접촉했는지 확인하는 함수
 
-
-
-//Generates food & Makes sure the food doesn't appear on top of the snake <- This sometimes causes a lag issue!!! Not too much of a problem tho
-int generateFood(int foodXY[], struct window WD, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
+int collisionObst(struct point PT, struct obstInfo OI)
 {
+	int i;
+	for (i = 0; i < OI.obstCount; i++)
+	{
+		if (PT.x == OI.obstXY[0][i] && PT.y == OI.obstXY[1][i])
+			return(true);
+	} // 입력한 PT좌표와 생성된 장애물들 좌표 비교
+	return(false);
+} // 장애물이 중복된 위치에 생성되지 않도록 하는 함수
 
+
+int generateFood(int foodXY[], int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
+{
 	struct point PT;
-
-	// int i 안써서 제거
 	do
 	{
 		srand((unsigned int)(time(NULL)));
-		foodXY[0] = rand() % (WD.width - 2) + 2;
+		foodXY[0] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 100000) % (defaultWidth - 2) + 2;
 		srand((unsigned int)(time(NULL)));
-		foodXY[1] = rand() % (WD.height - 6) + 2;
+		foodXY[1] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 100000) % (defaultHeight - 6) + 2;
 		PT.x = foodXY[0];
 		PT.y = foodXY[1];
-	} while (collisionSnake(PT, snakeXY, snakeLength, 0)); //This should prevent the "Food" from being created on top of the snake. - However the food has a chance to be created ontop of the snake, in which case the snake should eat it...
+	} while (collisionSnake(PT, snakeXY, snakeLength, 0)); // 콘솔 내 좌표 랜덤값과 뱀의 위에 Food가 생성되지 않도록 방지
 
 	gotoxy(foodXY[0], foodXY[1]);
-	printf("%c", FOOD);
+	printf("%c", FOOD); // Food 출력
 
 	return(0);
-}
+} // Food 생성 함수
+
+int generateObst(struct obstInfo *OI, int foodXY[], int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
+{
+	struct point PT;
+	do
+	{
+		srand((unsigned int)(time(NULL)));
+		OI->obstXY[0][OI->obstCount] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 1000000) % (defaultWidth - 2) + 2;
+		srand((unsigned int)(time(NULL)));
+		OI->obstXY[1][OI->obstCount] = (int)((double)rand() / (RAND_MAX) * (defaultWidth - 2.0) * 1000000) % (defaultHeight - 6) + 2;
+		PT.x = OI->obstXY[0][OI->obstCount];
+		PT.y = OI->obstXY[1][OI->obstCount];
+	} while (collisionSnake(PT, snakeXY, snakeLength, 0) 
+		|| collisionObst(PT, *OI)
+		|| (PT.x == foodXY[0] && PT.y == foodXY[1])
+		); // 생성되면 안되는 위치에 생성하는 것 방지
+
+	gotoxy(OI->obstXY[0][OI->obstCount], OI->obstXY[1][OI->obstCount]);
+	printf("%c", OBSTACLE); // 장애물 출력
+
+	return(0);
+} // 장애물 생성 함수
 
 
 void moveSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direction)
@@ -101,12 +112,8 @@ void moveSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direct
 	{
 		snakeXY[0][i] = snakeXY[0][i - 1];
 		snakeXY[1][i] = snakeXY[1][i - 1];
-	}
+	} // 뱀배열의 값을 한칸씩 이동시켜주는 반복문
 
-	/*
-	because we dont actually know the new snakes head x y,
-	we have to check the direction and add or take from it depending on the direction.
-	*/
 	switch (direction)
 	{
 	case DOWN_ARROW:
@@ -121,161 +128,137 @@ void moveSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direct
 	case LEFT_ARROW:
 		snakeXY[0][0]--;
 		break;
-	}
+	} // 현재 이동방향에 따라 뱀배열 Head좌표 수정
 
 	return;
-}
+} // 뱀배열 좌표를 이동시키는 함수
 
 void move(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direction)
 {
 	int x;
 	int y;
 
-	//Remove the tail ( HAS TO BE DONE BEFORE THE ARRAY IS MOVED!!!!! )
 	x = snakeXY[0][snakeLength - 1];
 	y = snakeXY[1][snakeLength - 1];
 
-	gotoxy(x, y);
-	printf("%c", BLANK);
+	gotoxy(x, y); // 뱀배열 제일 끝 좌표로 이동
+	printf("%c", BLANK); // 콘솔창 지우기
 
-	//Changes the head of the snake to a body part
-	gotoxy(snakeXY[0][0], snakeXY[1][0]);
-	printf("%c", SNAKE_BODY);
+	gotoxy(snakeXY[0][0], snakeXY[1][0]); // 뱀배열 Head좌표로 이동
+	printf("%c", SNAKE_BODY); // 현재 머리부분에 몸통 출력
 
-	moveSnakeArray(snakeXY, snakeLength, direction);
+	moveSnakeArray(snakeXY, snakeLength, direction); // 뱀배열 값 수정
 
-	gotoxy(snakeXY[0][0], snakeXY[1][0]);
-	printf("%c", SNAKE_HEAD);
+	gotoxy(snakeXY[0][0], snakeXY[1][0]); // 새로운 뱀 배열 Head좌표로 이동
+	printf("%c", SNAKE_HEAD); // Head출력
 
-	gotoxy(1, 1); //Gets rid of the darn flashing underscore.
+	gotoxy(zeroPoint, zeroPoint); // 입력창 지우기
 
 	return;
-}
+} // 뱀을 이동시키는 함수(새로 출력하는 함수)
 
-//This function checks if the snakes head his on top of the food, if it is then it'll generate some more food...
 int eatFood(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[])
 {
 	if (snakeXY[0][0] == foodXY[0] && snakeXY[1][0] == foodXY[1])
 	{
-		foodXY[0] = 0;
-		foodXY[1] = 0; //This should prevent a nasty bug (loops) need to check if the bug still exists...
+		foodXY[0] = zeroPoint;
+		foodXY[1] = zeroPoint;
 
-		printf("\7"); //Beep
+		printf("\7"); // 알림음
 		return(1);
 	}
 
 	return(0);
-}
+} // 뱀머리좌표와 음식의 좌표를 확인하는 함수
 
-
-int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], struct window WD, int snakeLength) //Need to Clean this up a bit
+int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, struct obstInfo OI)
 {
 	struct point PT;
 	PT.x = snakeXY[0][0];
 	PT.y = snakeXY[1][0];
-	int colision = 0;
-	if ((snakeXY[0][0] == 1) || (snakeXY[1][0] == 1) || (snakeXY[0][0] == WD.width) || (snakeXY[1][0] == WD.height - 4)) //Checks if the snake collided wit the wall or it's self
-		colision = 1;
+	int collision = false;
+	if ((snakeXY[0][0] == 1) || (snakeXY[1][0] == 1) || (snakeXY[0][0] == defaultWidth) || (snakeXY[1][0] == defaultHeight - calcWall))
+		collision = true; // 벽에 부딪혔는지 조건 검사
+	else if (collisionObst(PT, OI))
+		collision = true; // 장애물에 부딪혔는지 조건 검사
 	else
-		if (collisionSnake(PT, snakeXY, snakeLength, 1)) //If the snake collided with the wall, theres no point in checking if it collided with itself.
-			colision = 1;
+		if (collisionSnake(PT, snakeXY, snakeLength, 1))
+			collision = true; // 뱀 스스로 부딪혔는지 검사
 
-	return(colision);
-}
+	return(collision);
+} // 게임종료 조건의 충돌을 검사하는 함수
 
-
-
-//Messy, need to clean this function up
-void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct window WD, struct gameInfo GI)
+void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct gameInfo GI)
 {
-	int gameOver = 0;
+	int gameOver = false;
 	clock_t endWait;
 
-	//CLOCKS_PER_SEC-(n-1)*(CLOCKS_PER_SEC/10)
-	int waitMili = CLOCKS_PER_SEC - (GI.speed) * (CLOCKS_PER_SEC / 10);   //Sets the correct wait time according to the selected speed
-	int tempScore = 10 * GI.speed;
-	int oldDirection = 0;
-	int canChangeDirection = 1;
-	//int seconds = 1;
+	int waitMili = CLOCKS_PER_SEC - (speed) * (CLOCKS_PER_SEC / difficulty);// 진행 속도 설정
 
-	endWait = clock() + waitMili;
+	int canChangeDirection = true; // 방향 전환시 바뀌기 전에 
+	int oldDirection = false;
+	struct obstInfo OI; // 장애물 정보를 담는 구조체
+	OI.obstCount = initObstCount;
+
+	endWait = clock() + waitMili; // 현재시각 + 기다릴시간 계산
 
 	do
 	{
+
 		if (canChangeDirection)
 		{
 			oldDirection = GI.direction;
 			GI.direction = checkKeysPressed(GI.direction);
 		}
 
-		if (oldDirection != GI.direction)//Temp fix to prevent the snake from colliding with itself
-			canChangeDirection = 0;
+		if (oldDirection != GI.direction) // 방향이 바뀐 뒤 이동하기 전에 자신의 몸방향으로 이동하는 것을 방지
+			canChangeDirection = false;
 
-		if (clock() >= endWait) //haha, it moves according to how fast the computer running it is...
+
+		if (clock() >= endWait) // 지정해 놓은 시간을 넘어갔을때
 		{
-			//gotoxy(1,1);
-			//printf("%d - %d",clock() , endWait);
-			move(snakeXY, GI.snakeLength, GI.direction);
-			canChangeDirection = 1;
+			move(snakeXY, GI.snakeLength, GI.direction); // move함수 호출
+			canChangeDirection = true; // 이동한 뒤에는 다시 키 입력 가능
 
-
-			if (eatFood(snakeXY, foodXY))
+			if (eatFood(snakeXY, foodXY)) // 음식을 먹었을 때
 			{
-				generateFood(foodXY, WD , snakeXY, GI.snakeLength); //Generate More Food
-				GI.snakeLength++;
-				GI.score += GI.speed;
-				//x++;
-				//gotoxy(1,1);
-				//printf("%d >= %d", 10*speed+score, tempScore);
-				if (GI.score >= 10 * GI.speed + tempScore)
-					//if( 2 >= 2)
+				generateFood(foodXY, snakeXY, GI.snakeLength); // 음식을 새로 하나 생성
+				GI.snakeLength++; // 뱀 길이 증가
+				GI.score += addScore; // 점수 증가
+
+				if (GI.snakeLength % createObst == false)
 				{
-					GI.speed++;
-					tempScore = GI.score;
+					generateObst(&OI, foodXY, snakeXY, GI.snakeLength);
+				} // 뱀이 일정길이가 될때마다 장애물 생성
+				OI.obstCount++; // 장애물 갯수 카운트
 
-					if (GI.speed <= 9)//this needs to be fixed
-						waitMili = waitMili - (CLOCKS_PER_SEC / 10);
-					else
-					{
-						if (waitMili >= 40) //Maximum Speed (the game has to be beatable)
-							waitMili = waitMili - (CLOCKS_PER_SEC / 200);
-
-					}
-					//level++;
-					//gotoxy(1,2);
-					//printf("    ");
-					//gotoxy(1,2);
-					//printf("%d",waitMili);
-					//x = 0;
-				}
-
-				refreshInfoBar(GI.score, GI.speed);
+				refreshInfoBar(GI.score); // 정보 최신화
 			}
 
-			endWait = clock() + waitMili; //TEMP FIX, NEED TO FIND A WAY TO RESET CLOCK().. Na, seems to work fine this way...
+			endWait = clock() + waitMili; // 새로운 시간 설정
 		}
 
-		gameOver = collisionDetection(snakeXY, WD , GI.snakeLength);
+		gameOver = collisionDetection(snakeXY, GI.snakeLength, OI); // 게임 종료 검사
 
-		if (GI.snakeLength >= SNAKE_ARRAY_SIZE - 5) //Just to make sure it doesn't get longer then the array size & crash
+		if (GI.snakeLength >= SNAKE_ARRAY_SIZE - 5) // 게임 승리 조건
 		{
-			gameOver = 2;//You Win! <- doesn't seem to work - NEED TO FIX/TEST THIS
-			GI.score += 1500; //When you win you get an extra 1500 points!!!
+			gameOver = win; // 승리 저장
+			GI.score += extraPoint; // 승리시 추가 포인트
 		}
 
-	} while (!gameOver);
+	} while (!gameOver); // 조건에 검사되기 전까지 반복
 
-	switch (gameOver)
+	switch (gameOver) // 종료 case에 따라 결과 표시
 	{
-	case 1:
-		printf("\7"); //Beep
-		printf("\7"); //Beep
+	case lose:
+		printf("\7"); // 알람
+		printf("\7"); // 알람
 
-		gameOverScreen();
+		gameOverScreen(); // 패배화면
 
 		break;
-	case 2:
-		youWinScreen();
+	case win:
+		youWinScreen(); // 승리화면
 		break;
 	}
 
@@ -283,136 +266,97 @@ void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct window WD, 
 	{
 		inputScore(GI.score);
 		displayHighScores();
-	}
+	} // 스코어보드에 올라갈 점수라면 갱신
 
 	return;
-}
+} // 게임함수
 
 
 
 void loadSnake(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 {
 	int i;
-	/*
-	First off, The snake doesn't actually have enough XY coordinates (only 1 - the starting location), thus we use
-	these XY coordinates to "create" the other coordinates. For this we can actually use the function used to move the snake.
-	This helps create a "whole" snake instead of one "dot", when someone starts a game.
-	*/
-	//moveSnakeArray(snakeXY, snakeLength); //One thing to note ATM, the snake starts of one coordinate to whatever direction it's pointing...
-
-	//This should print out a snake :P
 	for (i = 0; i < snakeLength; i++)
 	{
 		gotoxy(snakeXY[0][i], snakeXY[1][i]);
-		printf("%c", SNAKE_BODY); //Meh, at some point I should make it so the snake starts off with a head...
+		printf("%c", SNAKE_BODY); // 몸통 출력
 	}
 
 	return;
-}
+} // 가장 처음 뱀 그리는 함수
 
 
-
-/* NOTE, This function will only work if the snakes starting direction is left!!!!
-Well it will work, but the results wont be the ones expected.. I need to fix this at some point.. */
 void prepairSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength)
 {
 	int i;
 	int snakeX = snakeXY[0][0];
-	int snakeY = snakeXY[1][0];
-
-	// this is used in the function move.. should maybe create a function for it...
-	/*switch(direction)
-	{
-	   case DOWN_ARROW:
-	   snakeXY[1][0]++;
-	   break;
-	   case RIGHT_ARROW:
-	   snakeXY[0][0]++;
-	   break;
-	   case UP_ARROW:
-	   snakeXY[1][0]--;
-	   break;
-	   case LEFT_ARROW:
-	   snakeXY[0][0]--;
-	   break;
-	}
-	*/
-
+	int snakeY = snakeXY[1][0]; // 첫 좌표 저장
 
 	for (i = 1; i <= snakeLength; i++)
 	{
 		snakeXY[0][i] = snakeX + i;
 		snakeXY[1][i] = snakeY;
-	}
+	} // 배열에 좌표 저장
 
 	return;
-}
+} // 가장 처음 뱀 배열에 좌표 저장하는 함수
 
 
-//This function loads the enviroment, snake, etc
 void loadGame(void)
 {
 	struct gameInfo GI;
-	int snakeXY[2][SNAKE_ARRAY_SIZE]; //Two Dimentional Array, the first array is for the X coordinates and the second array for the Y coordinates
+	int snakeXY[2][SNAKE_ARRAY_SIZE]; // 뱀 배열
 
-	GI.snakeLength= 4; //Starting Length
+	GI.snakeLength= defaultSnakeL; // 시작 길이
 
-	GI.direction = LEFT_ARROW; //DO NOT CHANGE THIS TO RIGHT ARROW, THE GAME WILL INSTANTLY BE OVER IF YOU DO!!! <- Unless the prepairSnakeArray function is changed to take into account the direction....
+	GI.direction = LEFT_ARROW; // 처음설정 방향
 
-	int foodXY[] = { 5,5 };// Stores the location of the food
+	int foodXY[2];// 음식 위치 저장할 배열
 
-	GI.score= 0;
-	//int level = 1;
+	GI.score= 0; // 시작 점수
 
-	struct window WD;
-	WD.width = 80;
-	WD.height = 25;
-	GI.speed = getGameSpeed();
+	getGameStart(); // speed 입력받는 함수
+	snakeXY[0][0] = startSnakeX; // 시작위치
+	snakeXY[1][0] = startSnakeY;
 
-	//The starting location of the snake
-	snakeXY[0][0] = 40;
-	snakeXY[1][0] = 10;
-
-	loadEnvironment(WD); //borders
-	prepairSnakeArray(snakeXY, GI.snakeLength);
-	loadSnake(snakeXY, GI.snakeLength);
-	generateFood(foodXY, WD , snakeXY, GI.snakeLength);
-	refreshInfoBar(GI.score, GI.speed); //Bottom info bar. Score, Level etc
-	startGame(snakeXY, foodXY, WD, GI);
+	loadEnvironment(); // 배경설정 불러오기
+	prepairSnakeArray(snakeXY, GI.snakeLength); // 뱀배열에 값넣기
+	loadSnake(snakeXY, GI.snakeLength); // 뱀배열 그리기
+	generateFood(foodXY, snakeXY, GI.snakeLength); // 음식생성
+	refreshInfoBar(GI.score); // 하단에 정보 초기화
+	startGame(snakeXY, foodXY, GI); // 게임 시작함수 호출
 
 	return;
-}
+} // 게임 기본 환경설정을 불러오는 함수
 
 
-void loadEnvironment(struct window WD)//This can be done in a better way... FIX ME!!!! Also i think it doesn't work properly in ubuntu <- Fixed
+void loadEnvironment(void)
 {
-	int x = 1, y = 1;
-	int rectangleHeight = WD.height - 4;
+	int x = zeroPoint, y = zeroPoint;
+	int heightCount = defaultHeight - calcWall;
 
-	clrscr(); //clear the console
+	clrscr(); // 화면 초기화
 
-	gotoxy(x, y); //Top left corner
+	gotoxy(x, y); // 화면 좌측 상단으로 이동
 
-	for (; y < rectangleHeight; y++)
+	for (; y < heightCount; y++)
 	{
-		gotoxy(x, y); //Left Wall 
+		gotoxy(x, y); // 좌측 벽
 		printf("%c", WALL);
 
-		gotoxy(WD.width, y); //Right Wall
-
+		gotoxy(defaultWidth, y); // 우측 벽
 		printf("%c", WALL);
 	}
 
 	y = 1;
 
-	for (; x < WD.width + 1; x++)
+	for (; x < defaultWidth + 1; x++)
 	{
-		gotoxy(x, y); //Left Wall 
+		gotoxy(x, y); // 상단 벽
 		printf("%c", WALL);
 
-		gotoxy(x, rectangleHeight); //Right Wall
+		gotoxy(x, heightCount); // 하단 벽
 		printf("%c", WALL);
 	}
 	return;
-}
-
+} // 배경 불러오는 함수

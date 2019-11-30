@@ -1,9 +1,26 @@
-#ifndef INGAME_H
+﻿#ifndef INGAME_H
 #define INGAME_H
 
 #include <time.h>
 
 #define SNAKE_ARRAY_SIZE 310
+#define WALL_SIZE 20
+
+struct point {
+	int x;
+	int y;
+}; // x,y 좌표 저장
+
+struct gameInfo {
+	int snakeLength;
+	int direction;
+	int score;
+}; // 게임 정보 저장
+
+struct obstInfo {
+	int obstXY[2][WALL_SIZE];
+	int obstCount;
+};
 
 enum graphic {
 	SNAKE_HEAD = 'X',
@@ -11,34 +28,62 @@ enum graphic {
 	FOOD = '*',
 	BLANK = ' ',
 	WALL = '+',
+	OBSTACLE = '#'
 }; // 열거형 사용
 
+enum inGameConstValue {
+	zeroPoint = 0,
+	false = 0,
+	true = 1,
+	lose = 1,
+	win = 2,
+	difficulty = 10,
+	speed = 9,
+	maxWaitMili = 40,
+	calcSec = 200,
+	extraPoint = 1500,
+	defaultSnakeL = 4,
+	defaultWidth = 80,
+	defaultHeight = 25,
+	startSnakeX = 40,
+	startSnakeY = 10,
+	calcWall = 4,
+	addScore = 9,
+	gameStartX = 22,
+	gameStartY = 11,
+	initObstCount = 0,
+	createObst = 3,
+};
 
-int getGameSpeed(void);
+int getGameStart(void);
 
-int checkKeysPressed(int direction);
+int checkKeysPressed(int);
 
-int collisionSnake(struct point PT, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int detect);
+int collisionSnake(struct point, int [][SNAKE_ARRAY_SIZE], int, int);
 
-int generateFood(int foodXY[], struct window WD, int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength);
+int collisionObst(struct point, struct obstInfo);
 
-void moveSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direction);
+int generateFood(int [], int [][SNAKE_ARRAY_SIZE], int);
 
-void move(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength, int direction);
+int generateObst(struct obstInfo* , int [], int [][SNAKE_ARRAY_SIZE], int);
 
-int eatFood(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[]);
+void moveSnakeArray(int [][SNAKE_ARRAY_SIZE], int, int);
 
-int collisionDetection(int snakeXY[][SNAKE_ARRAY_SIZE], struct window WD, int snakeLength);
+void move(int [][SNAKE_ARRAY_SIZE], int, int);
 
-void startGame(int snakeXY[][SNAKE_ARRAY_SIZE], int foodXY[], struct window WD, struct gameInfo GI);
+int eatFood(int [][SNAKE_ARRAY_SIZE], int []);
 
-void loadSnake(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength);
+int collisionDetection(int [][SNAKE_ARRAY_SIZE], int, struct obstInfo);
 
-void prepairSnakeArray(int snakeXY[][SNAKE_ARRAY_SIZE], int snakeLength);
+void startGame(int [][SNAKE_ARRAY_SIZE], int [], struct gameInfo);
+
+void loadSnake(int [][SNAKE_ARRAY_SIZE], int);
+
+void prepairSnakeArray(int [][SNAKE_ARRAY_SIZE], int);
 
 void loadGame(void);
 
-void loadEnvironment(struct window WD);
+void loadEnvironment(void);
 
 #endif
 

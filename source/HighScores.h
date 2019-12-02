@@ -21,6 +21,8 @@ void inputScore(int score);
 
 void displayHighScores();
 
+int getLowestScore();
+
 enum constvalue
 {
 	xpos = 20,
